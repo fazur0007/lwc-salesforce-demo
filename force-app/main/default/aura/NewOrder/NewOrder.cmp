@@ -1,0 +1,498 @@
+<aura:component controller="Ltng_NewOrderCtrl" 
+                implements="force:appHostable,lightning:isUrlAddressable,flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global" >  
+    
+    <aura:attribute name="brands" type="Map"/> 
+    <aura:attribute name="config" type="Object"/>
+    <aura:attribute name="orderTypes" type="Map"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="value" type="String"/> 
+    <aura:attribute name="selectRelatedProduct" type="String"/>
+    <aura:attribute name="brandValue" type="String"/>
+    <aura:attribute name="orderTypeValue" type="String"/>
+    <aura:attribute name="isOpen" type="boolean" default="true"/>
+    <aura:attribute name="isPersonAccount" type="boolean" default="false"/> 
+    <aura:attribute name="isPortalUser" type="boolean" default="false"/>
+    
+    <aura:attribute name="isBrandTypeSelected" type="boolean" default="true"/>
+    <aura:attribute name="showNewRecord" type="boolean" default="true"/>
+    <aura:attribute name="isErrorOccured" type="boolean" default="false"/>
+    <aura:attribute name="hasOrder" type="boolean" default="false"/>
+    <aura:attribute name="isAtleaseRecordSelected" type="boolean" default="false"/>
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute type="Boolean" name="showLoader" default="true"/> 
+    <aura:attribute type="Boolean" name="isQuantitySectionEnabled" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doLoadData}"/>
+    <aura:attribute name="orderId" type="String" />
+    <aura:attribute name="selectedValue" type="String"/>
+    
+    <aura:attribute type="String" name="sortField" />
+    <aura:attribute type="Boolean" name="sortAsc" />
+    <aura:attribute name="wrapperList" type="object"/>
+    <aura:attribute name="selectedWrapper" type="object"/> 
+    <aura:attribute name="selectedWrapperfromApex" type="object"/>
+    <lightning:navigation aura:id="navLink"/>
+    <aura:attribute name="options" type="List" default="[
+                                                        { id: 'AX_Item_Number__c', label: 'AX Item Number' },
+                                                        { id: 'Name', label: 'SKU', selected: true },
+                                                        { id: 'Product_Type__c', label: 'Product Type' },
+                                                        { id: 'BusinessUnit__c', label: 'Business Unit' }
+                                                        ]"/>    
+    <aura:attribute name="currentPageNumber" type="Integer" default="1"/>
+    <aura:attribute name="pageSize" type="Integer" default="50"/>
+    <aura:attribute name="totalPages" type="Integer" default="0"/>
+    <aura:attribute name="pageList" type="List"/>
+    <aura:attribute name="issearching"    type="Boolean" default="false"/>
+    
+    <aura:attribute name="listControllingValues" type="list" default="[]"/>
+    <aura:attribute name="listDependingValues" type="list" default="['--- None ---']"/>
+    <aura:attribute name="depnedentFieldMap" type="map"/>
+    <aura:attribute name="bDisabledDependentFld" type="boolean" default="true"/> 
+    
+    <aura:attribute name="objDetail" type="Order" default="{'sobjectType' : 'Order'}"/>
+    <aura:attribute name="controllingFieldAPI" type="string" default="Country__c"/>
+    <aura:attribute name="dependingFieldAPI" type="string" default="Shipping_Method__c"/>
+    
+    <!--Hard coding values Start-->
+    <aura:attribute name="NewOrder_OrderTypesMessage" type="String" default="{!$Label.c.NewOrder_OrderTypesMessage}"/>
+    <aura:attribute name="NewOrder_NewOrderMessage" type="String" default="{!$Label.c.NewOrder_NewOrderMessage}"/>
+
+    <aura:attribute name="NewOrder_BrandMessage" type="String" default="{!$Label.c.NewOrder_BrandMessage}"/>
+    <aura:attribute name="NewOrder_ShippingMethodMessage" type="String" default="{!$Label.c.NewOrder_ShippingMethodMessage}"/>
+    <!--Hard coding values End-->
+    <aura:html tag="style"> 
+        .slds-modal__container{ 
+        height: 101%;
+        width: 93%;
+        max-width: 377vh !important;
+        max-height: 300vh !important; 
+        } 
+        .modal-body{ 
+        height : 300vh !important; 
+        max-height: 1000vh !important; 
+        } 
+        .slds-modal__footer{ 
+        display: inline !important; 
+        }
+    </aura:html>
+    <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if> 
+    <aura:if isTrue="{!v.isBrandTypeSelected}">
+        <!--<aura:if isTrue="{!v.hasOrder}">
+            <center><span style="color: red;">Already an Order is associated with this Case</span></center>
+        </aura:if>-->
+        <aura:if isTrue="{!!v.hasOrder}">
+            <aura:if isTrue="{!!v.isErrorOccured}">
+                <br/><br/>
+            </aura:if> 
+            <header class="slds-modal__header">
+                <h2 class="slds-text-heading_medium"><b>{!v.NewOrder_NewOrderMessage}</b></h2>
+            </header>
+            <div class="c-container">
+                <aura:if isTrue="{!not(empty(v.brands))}">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="1" padding="around-small">
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="2" padding="around-small">
+                            <b>{!v.NewOrder_BrandMessage}</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="4" padding="around-small">
+                            <lightning:radioGroup name="brands" 
+                                                  aura:id="brands"
+                                                  label=""
+                                                  options="{! v.brands }"
+                                                  value="{! v.brandValue }"
+                                                  type="radio"
+                                                  onchange="{! c.handleBrandValue }"
+                                                  />
+                        </lightning:layoutItem>            
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="5" padding="around-small">
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </aura:if>
+                <aura:if isTrue="{!not(empty(v.orderTypes))}">
+                    <lightning:layout multipleRows="true">                
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="1" padding="around-small">
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="2" padding="around-small">
+                            <b>{!v.NewOrder_OrderTypesMessage}</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="4" padding="around-small">
+                            <lightning:radioGroup name="orderTypes" 
+                                                  aura:id="orderTypes"
+                                                  label=""
+                                                  options="{! v.orderTypes }"
+                                                  value="{! v.orderTypeValue }"
+                                                  type="radio"
+                                                  />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </aura:if>
+                <!--<aura:if isTrue="{!v.config.objectType == 'Account'}">
+                <aura:if isTrue="{!not(empty(v.listDependingValues))}">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="1" padding="around-small">
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="2" padding="around-small">
+                            <b>{!v.NewOrder_ShippingMethodMessage}</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="2" padding="around-small">
+                            <lightning:select name="dependentFld"
+                                              value="{!v.objDetail.Shipping_Method__c}"
+                                              disabled="{!v.bDisabledDependentFld}">
+                                <aura:iteration items="{!v.listDependingValues}" var="val">
+                                    <option value="{!val}">{!val}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="7" padding="around-small">
+                        </lightning:layoutItem> 
+                    </lightning:layout>
+                </aura:if>
+            </aura:if>-->
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="1" padding="around-small">
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="11" padding="around-small">
+                        <div>
+                            <br/>
+                            <lightning:button variant="Neutral" label="Cancel" title="Cancel" onclick="{! c.handleCancel }" />
+                            <lightning:button variant="brand" label="Next" title="Next" onclick="{! c.handleNext }" iconName="utility:right" iconPosition="right"/>
+                        </div>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div>
+        </aura:if> 
+    </aura:if>
+    <aura:if isTrue="{!!v.isBrandTypeSelected}">
+        <aura:if isTrue="{!!v.isQuantitySectionEnabled}">
+            <!--<c:Ltng_AddOrderProduct orderId="{!v.orderId}" isOpen="{!v.isOpen}"/> -->
+            <div class="slds-p-vertical_x-small slds-p-horizontal_large slds-shrink-none slds-theme_shade">
+                <div class="demo-only demo-only--sizing slds-grid slds-wrap slds-m-around_x-small"> 
+                    <div class="slds-size_5-of-12">
+                        <lightning:input
+                                         label="Product Search"
+                                         placeholder="By Keyword"
+                                         aura:id="enter-search"
+                                         name="enter-search"
+                                         type="search"
+                                         />
+                    </div>
+                    <div class="slds-size_2-of-12">
+                        <lightning:select name="fieldId" label="By Field Filter" aura:id="fieldId" value="{!v.selectedValue}">
+                            <aura:iteration items="{!v.options}" var="option">
+                                <option text="{!option.label}" value="{!option.id}" selected="{!option.selected}"/>
+                            </aura:iteration>
+                        </lightning:select>
+                    </div>
+                    <div class="slds-size_1-of-12" style="margin-top: auto;">
+                        <div class="slds-align_absolute-center"> 
+                            <lightning:button variant="brand" label="Search" title="Search" onclick="{! c.doSearchRecs }" />
+                        </div>
+                    </div>
+                    <!--<div class="slds-size_4-of-12" style="margin-top: auto;">
+                        <div class="slds-clearfix">
+                            <div class="slds-float_right">
+                                <lightning:button variant="brand" label="Cancel" title="Search" onclick="{! c.handleCancel }" /> 
+                                <lightning:button variant="brand" label="Select &amp; Next" title="Search" onclick="{! c.doSelectPricebooks }" />
+                            </div>
+                        </div>                 
+                    </div> -->
+                </div>
+            </div>
+            <br/>
+            <table  style="table-layout:fixed;width:100%;border-collapse: collapse;height: 40px;white-space: break-spaces;" class="slds-table slds-border_left slds-border_right slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                <tr class="slds-text-title_caps">
+                    <th scope="col" align="left"  title="{!$Label.c.NewOrder_Action}"> 
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;"></div></strong>
+                    </th>
+                    <th scope="col" align="left" title="{!$Label.c.NewOrder_SKU}" style="white-space: break-spaces;width:9%;"> 
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;">{!$Label.c.NewOrder_SKU}</div></strong>
+                    </th>
+                    <th scope="col" align="left" title="{!$Label.c.NewOrderGlobalDescription}" style="white-space: break-spaces;width:20%;">                                        
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;">{!$Label.c.NewOrderGlobalDescription}</div></strong>
+                    </th>
+                    <th scope="col" align="left"  title="{!$Label.c.NewOrder_AXItemNumber}" style="white-space: break-spaces;width:11%;">
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;">{!$Label.c.NewOrder_AXItemNumber}</div></strong>
+                    </th>                            
+                    <th scope="col" align="left"  title="{!$Label.c.NewOrder_Substitution_Number}" style="white-space: break-spaces;width:9%;">
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;">{!$Label.c.NewOrder_Substitution_Number}</div></strong>
+                    </th>
+                    <th scope="col" align="left"  title="{!$Label.c.NewOrder_List_Price}" style="white-space: break-spaces;">
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;">{!$Label.c.NewOrder_List_Price}</div></strong>
+                    </th>
+                    <th scope="col" align="left" title="{!$Label.c.NewOrder_Retail_Price}" style="white-space: break-spaces;">
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;">{!$Label.c.NewOrder_Retail_Price}</div></strong>
+                    </th>
+                    <th scope="col" align="left" title="{!$Label.c.NewOrder_Promotional_Price}" style="white-space: break-spaces;">
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;">{!$Label.c.NewOrder_Promotional_Price}</div></strong>
+                    </th>
+                    <th scope="col" align="left" title="{!$Label.c.NewOrder_Quantity_Available}" style="white-space: break-spaces;">
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;">{!$Label.c.NewOrder_Quantity_Available}</div></strong>
+                    </th>
+                    <th scope="col" align="left" title="{!$Label.c.NewOrder_Available_Date}" style="white-space: break-spaces;">
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;">{!$Label.c.NewOrder_Available_Date}</div></strong>
+                    </th>
+                    <!-- <th scope="col" align="left" title="{!$Label.c.NewOrder_Alternative_Product}" style="white-space: break-spaces;">
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;">{!$Label.c.NewOrder_Alternative_Product}</div></strong>
+                    </th> -->
+                    <!-- <aura:if isTrue="{!and(v.isPersonAccount,!v.isPortalUser)}">-->
+                    <th scope="col" align="left" title="{!$Label.c.NewOrder_Available_to_Sell}" style="white-space: break-spaces;">
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;">{!$Label.c.NewOrder_Available_to_Sell}</div></strong>
+                    </th>
+                    <!-- </aura:if>-->
+                    <th scope="col" align="left"  title="{!$Label.c.NewOrder_Spare_Parts_Use_Internal}" style="white-space: break-spaces;">
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;">{!$Label.c.NewOrder_Spare_Parts_Use_Internal}</div></strong>
+                    </th>
+                    <th scope="col" align="left" title="{!$Label.c.NewOrder_Spare_Parts_Use_External}" style="white-space: break-spaces;">
+                        <strong><div class="slds-truncate" style="white-space: break-spaces;">{!$Label.c.NewOrder_Spare_Parts_Use_External}</div></strong>
+                    </th>
+                </tr>
+            </table>
+            <div class="slds-scrollable"  style="overflow:auto;" >
+                <div style="display: block; height: 330px;overflow-y: auto;overflow-x: hidden;">
+                    <table  style="table-layout:fixed;width:101%;border-collapse: collapse;" class="slds-table slds-border_left slds-border_right slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">    
+                        <tbody>
+                            <aura:if isTrue="{!not(empty(v.data))}">
+                                <aura:iteration items="{!v.data}" var="pbeRec" indexVar="index"> 
+                                    <tr  data-selected-Index="{!index}">
+                                        <td scope="row" data-label="sectIdx" title="{!pbeRec.selected}">
+                                            <label class="slds-checkbox">
+                                                <ui:inputCheckbox  class="slds-checkbox--faux" aura:id="checkAccountId" value="{!pbeRec.selected}" text="{!pbeRec.pberecord.Id}"/>
+                                                <!--disabled="{!!pbeRec.pberecord.Product2.Available_To_Sell__c}"-->
+                                                <span class="slds-checkbox--faux"></span>
+                                                <span class="slds-form-element__label text"></span>
+                                            </label>
+                                        </td>
+                                        <td scope="row" style="width:9%;" data-label="sectIdx" title="{!pbeRec.pberecord.Product2.Name}">
+                                            <div class="slds-truncate">{!pbeRec.pberecord.Product2.Name}</div>
+                                        </td>
+                                        <td scope="row" style="width:20%;" data-label="sectIdx" title="{!pbeRec.pberecord.Product2.Description}">
+                                            <div class="slds-truncate">{!pbeRec.pberecord.Product2.Description}</div>
+                                        </td>
+                                        <td scope="row" style="width:11%;"  data-label="sectIdx" title="{!pbeRec.pberecord.Product2.AX_Item_Number__c}">
+                                            <div class="slds-truncate">{!pbeRec.pberecord.Product2.AX_Item_Number__c}</div>
+                                        </td>
+                                        <td scope="row" style="width:9%;"  data-label="sectIdx" title="{!pbeRec.pberecord.UnitPrice}">
+                                            <div class="slds-truncate">{!pbeRec.pberecord.Product2.Substitution_Number__c}</div>
+                                        </td>
+                                        <td scope="row" data-label="sectIdx" title="">
+                                            <div class="slds-truncate">{!pbeRec.pberecord.UnitPrice}</div>
+                                        </td>
+                                        <td scope="row" data-label="sectIdx" title="{!pbeRec.pberecord.Product2.MAP__c}">
+                                            <div class="slds-truncate">{!pbeRec.pberecord.Product2.MAP__c}</div>
+                                        </td>
+                                        <td scope="row" data-label="sectIdx" title="{!pbeRec.promotionalPricewithCurrency}">
+                                            <div class="slds-truncate">{!pbeRec.promotionalPricewithCurrency}</div>
+                                        </td>
+                                        <td scope="row" data-label="sectIdx" title="{!pbeRec.pberecord.Product2.Quantity_Available__c}">
+                                            <div class="slds-truncate">{!pbeRec.pberecord.Product2.Quantity_Available__c}</div>
+                                        </td>
+                                        <td scope="row" data-label="sectIdx" title="{!pbeRec.pberecord.Product2.Available_Date__c}">
+                                            <div class="slds-truncate">{!pbeRec.pberecord.Product2.Available_Date__c}</div>
+                                        </td>
+                                        <!--<td scope="row"  data-label="sectIdx" title="{!pbeRec.pberecord.Product2.AlternativeProduct__r.Name}">
+                                            <div class="slds-truncate">{!pbeRec.pberecord.Product2.AlternativeProduct__r.Name}</div>
+                                        </td>-->
+                                        <!--<aura:if isTrue="{!and(v.isPersonAccount,!v.isPortalUser)}">-->
+                                        <td scope="row" data-label="sectIdx" title="{!pbeRec.isAvailableToSell}">
+                                            <div class="slds-truncate">
+                                                <lightning:input type="checkbox" checked="{!pbeRec.isAvailableToSell}" disabled="true"/>
+                                            </div>
+                                        </td>
+                                        <!-- </aura:if>-->
+                                        <td scope="row" data-label="sectIdx" title="{!pbeRec.pberecord.Product2.Spare_Parts_Use_Internal__c}">
+                                            <div class="slds-truncate">
+                                                <lightning:input type="checkbox" checked="{!pbeRec.pberecord.Product2.Spare_Parts_Use_Internal__c}" disabled="true"/>
+                                            </div>
+                                        </td>
+                                        <td scope="row" data-label="sectIdx" title="{!pbeRec.pberecord.Product2.Spare_Parts_Use_External__c}">
+                                            <div class="slds-truncate">
+                                                <lightning:input type="checkbox" checked="{!pbeRec.pberecord.Product2.Spare_Parts_Use_External__c}" disabled="true"/>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </aura:iteration>
+                            </aura:if>  
+                        </tbody>
+                    </table>
+                    <aura:if isTrue="{!empty(v.data)}">                        
+                        <div class="slds-align_absolute-center slds-box" style="height:4rem;font-size: larger;">{!v.NewOrder_Error}</div>
+                    </aura:if>
+                </div>
+                <lightning:layout multipleRows="true" horizontalAlign="center">
+                    <lightning:layoutItem padding="around-small" flexibility="auto">
+                        <lightning:button label="First" iconName="utility:left" iconPosition="left" variant="brand"
+                                          onclick="{!c.onFirst}" disabled="{! v.currentPageNumber == 1}"/>
+                        <lightning:button  label="Previous" iconName="utility:left" iconPosition="left" variant="brand"
+                                          onclick="{!c.onPrev}" disabled="{! v.currentPageNumber == 1}"/>               
+                        <span class="slds-p-horizontal_x-small">
+                            <a onclick="{!c.processMe}" name="1" 
+                               class="{! (v.currentPageNumber == 1) ? 'slds-button slds-button_brand' : 'slds-button slds-button_neutral'}">1</a>
+                        </span>
+                        <aura:iteration items="{!v.pageList}" var="item">
+                            <span class="slds-p-horizontal_x-small">
+                                <a onclick="{!c.processMe}" name="{!item}"
+                                   class="{! (v.currentPageNumber == item) ? 'slds-button slds-button_brand' : 'slds-button slds-button_neutral'}">{!item}</a>
+                            </span>
+                        </aura:iteration>                
+                        <span class="slds-p-horizontal_xxx-small">
+                            <a>...</a>
+                        </span>
+                        <span class="slds-p-horizontal_x-small">
+                            <a onclick="{!c.processMe}" name="{!v.totalPages}"
+                               class="{! (v.currentPageNumber == v.totalPages) ? 'slds-button slds-button_brand' : 'slds-button slds-button_neutral'}">{!v.totalPages}</a>
+                        </span>                
+                        <lightning:button label="Next"  iconName="utility:right" iconPosition="right" variant="brand"
+                                          disabled="{! v.currentPageNumber == v.totalPages}" onclick="{!c.onNext}"/>
+                        <lightning:button label="Last" iconName="utility:right" iconPosition="right" variant="brand"
+                                          disabled="{! v.currentPageNumber == v.totalPages}" onclick="{!c.onLast}"/>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div> 
+            <div class="demo-only demo-only--sizing slds-grid slds-wrap slds-m-around_x-small">
+                <div class="slds-size_12-of-12" style="margin-top: auto;">
+                    <div class="slds-clearfix">
+                        <div class="slds-float_right"> 
+                            <lightning:button  variant="Neutral" label="Cancel" title="Search" onclick="{! c.handleCancel }" /> 
+                            <lightning:button variant="brand" label="Select &amp;  Next" iconName="utility:right" iconPosition="right" title="Search" onclick="{! c.doSelectPricebooks }" />
+                        </div>
+                    </div>                 
+                </div> 
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.isQuantitySectionEnabled}">
+            <header class="slds-modal__header">
+                <h2 class="slds-text-heading_medium"><b>{!$Label.c.NewOrder_Selected_Products}</b></h2>
+            </header>
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                <thead>
+                    <tr class="slds-text-title_caps" style="height: 35px !important;">
+                        <th scope="col"> 
+                            <strong><div class="slds-truncate">{!$Label.c.NewOrder_Product}</div></strong>
+                        </th>
+                        <th scope="col"> 
+                            <strong><div class="slds-truncate">{!$Label.c.NewOrder_List_Price}</div></strong>
+                        </th>
+                        <th scope="col">                                        
+                            <strong><div class="slds-truncate">{!$Label.c.NewOrder_Quantity}</div></strong>
+                        </th>
+                        <th scope="col">
+                            <strong><div class="slds-truncate">{!$Label.c.NewOrder_Unit_Price}</div></strong>
+                        </th>
+                        <aura:if isTrue="{!and(!v.isPortalUser,v.brandValue !='Beanz')}">
+                            <th scope="col">
+                                <strong><div class="slds-truncate">Related Product</div></strong>
+                            </th>
+                            <th scope="col">
+                                <strong><div class="slds-truncate">Quantity</div></strong>
+                            </th>
+                        </aura:if>
+                        <aura:if isTrue="{!and(!v.isPortalUser,v.brandValue=='Beanz')}">
+                            <th scope="col">
+                                <strong><div class="slds-truncate">Grind Type</div></strong>
+                            </th>
+                        </aura:if>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:if isTrue="{!and(v.isPortalUser,not(empty(v.selectedWrapper)))}">
+                        <aura:iteration items="{!v.selectedWrapper}" var="pbeRec" indexVar="index"> 
+                            <tr  data-selected-Index="{!index}"  style="line-height: 10px;">
+                                <td scope="row" data-label="sectIdx">
+                                    <div class="slds-truncate">{!pbeRec.pberecord.Product2.Name}</div>
+                                </td>
+                                <td scope="row"  data-label="sectIdx">
+                                    <div class="slds-truncate">{!pbeRec.pberecord.UnitPrice}</div>
+                                </td>
+                                <td scope="row" data-label="sectIdx">
+                                    <div class="slds-truncate">
+                                        <lightning:input aura:id="field" min="1.0" required="true" type="number" value="{!pbeRec.quantity}" style="{!if(pbeRec.qtyErrorMessage!=null,'border-color: red;','')}"/> 
+                                        <ui:outputText value="{!pbeRec.qtyErrorMessage}" class="qtyErrorMessageClass"/>
+                                    </div>
+                                </td>
+                                <td scope="row" data-label="sectIdx">                                            
+                                    <div class="slds-truncate">
+                                        <lightning:input type="number" value="{!pbeRec.unitPrice}" min="0"/> 
+                                        <aura:if isTrue="{!pbeRec.isPromotionApplied}">
+                                            <ui:outputText value="{!pbeRec.promotionAppliedMessage}" class="promotionAppliedMessageCss"/>
+                                        </aura:if>
+                                    </div>
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </aura:if>
+                    <aura:if isTrue="{!and(!v.isPortalUser,not(empty(v.selectedWrapperfromApex)))}">
+                        <aura:iteration items="{!v.selectedWrapperfromApex}" var="pbeRec" indexVar="index"> 
+                            <tr  data-selected-Index="{!index}"  style="line-height: 10px;">
+                                <td scope="row" data-label="sectIdx">
+                                    <div class="slds-truncate">{!pbeRec.productRecName}</div>
+                                </td>
+                                <td scope="row"  data-label="sectIdx">
+                                    <div class="slds-truncate">{!pbeRec.unitPrice}</div>
+                                </td>
+                                <td scope="row" data-label="sectIdx">
+                                    <div class="slds-truncate">
+                                        <lightning:input aura:id="field" min="1.0" required="true" type="number" value="{!pbeRec.quantity}"/>                                    
+                                    </div>
+                                </td>
+                                <td scope="row" data-label="sectIdx">                                            
+                                    <div class="slds-truncate">
+                                        <lightning:input type="number" value="{!pbeRec.unitPrice}" min="0"/> 
+                                    </div>
+                                </td>
+                                <aura:if isTrue="{!v.brandValue =='Beanz'}">
+                                    <td scope="row" data-label="sectIdx"> 
+                                        <lightning:select aura:id="selectedGrindType"  required="true" name="selectedGrindType"  value="{!pbeRec.selectedGrindType}" messageWhenValueMissing="Grind Type is required for Beanz orders">
+                                            <option value="">--None--</option>
+                                            <aura:iteration items="{!pbeRec.grindTypeList}" var="grindType">
+                                                <option value="{!grindType}"> {!grindType}</option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </td>
+                                </aura:if>
+                                <aura:if isTrue="{!v.brandValue !='Beanz'}">
+                                    <td scope="row" data-label="sectIdx"> 
+                                        <lightning:select aura:id="selectedRelatedProduct" name="selectedRelatedProduct"  value="{!pbeRec.selectedRelatedProduct}" messageWhenValueMissing="Select related product">
+                                            <option value="">--None--</option>
+                                            <aura:iteration items="{!pbeRec.relatedProducts}" var="relatedProductRec">
+                                                <option text="{!relatedProductRec.label}" value="{!relatedProductRec.value}" selected="{relatedProductRec.selected}"/>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </td>
+                                    <td scope="row" data-label="sectIdx"> 
+                                        <lightning:input type="number" value="{!pbeRec.relatedProductQuantity}"/> 
+                                    </td>
+                                </aura:if>
+                            </tr>
+                        </aura:iteration>
+                    </aura:if>
+                </tbody>
+            </table>
+            <br/><br/>
+            <!--<aura:if isTrue="{!and(v.isPortalUser,not(empty(v.selectedWrapper)))}">-->
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_12-of-12" style="margin-top: auto;">
+                    <div class="slds-clearfix">
+                        <div class="slds-float_right"> 
+                            <lightning:button variant="brand" iconName="utility:left" iconPosition="left" label="Back" title="Back" onclick="{! c.goBackToSelectionPage }" /> 
+                            <lightning:button variant="brand" label="Save" title="Save" iconName="utility:save" iconPosition="right" onclick="{! c.doSaveSeletedPricebooks }" />
+                            <lightning:button label="Save &amp; More" title="SaveMore" iconName="utility:right" iconPosition="right" variant="brand" onclick="{!c.doSaveSeletedPricebooks }"/>
+                            <lightning:button variant="Neutral" label="Cancel" title="Cancel" onclick="{! c.handleCancel }" />                        
+                        </div>
+                    </div> 
+                </div> 
+            </div>
+        </aura:if>
+    </aura:if>
+    <!--</aura:if>-->
+</aura:component>

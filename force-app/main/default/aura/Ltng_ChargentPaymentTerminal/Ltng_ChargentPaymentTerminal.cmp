@@ -1,0 +1,198 @@
+<aura:component controller="Ltng_ChargentPaymentTerminal" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:attribute name="recordId" type="String" /> 
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+    <lightning:workspaceAPI aura:id="workspace" />
+    <lightning:workspaceAPI aura:id="workspaceAPI" />
+    <lightning:navigation aura:id="navLink"/>
+    
+    <aura:attribute type="Boolean" name="showLoader" default="true"/>
+    <aura:attribute name="ChargentOrders__Payment_Method" type="ChargentOrders__ChargentOrder__c" default="{ 'sobjectType': 'ChargentOrders__ChargentOrder__c' }"/> 
+    <aura:html tag="style">
+        .slds-modal__container{ 
+        width: 60%;
+        max-width: 377vh !important;
+        } 
+        .modal-body{ 
+        height : 300vh !important; 
+        max-height: 1000vh !important; 
+        } 
+        .slds-modal__footer{ 
+        display: inline !important; 
+        }
+    </aura:html>
+    <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <div class="slds--header-fixed_container" style="height:450px;">
+        <header class="slds-modal__header">
+            <h2 class="slds-text-heading_medium"><b>Payment Information</b></h2>
+        </header>
+        <br/>
+        <div class="slds-scrollable" style="height:100%;">
+            <div class="slds-p-left_large slds-p-right_medium">            
+                <lightning:recordEditForm density="comfy"
+                                          aura:id="recordEditForm"
+                                          onload="{!c.doLoadData}"
+                                          onsubmit="{!c.handleSubmit}"
+                                          onsuccess="{!c.handleSuccess}"
+                                          objectApiName = "ChargentOrders__ChargentOrder__c" >
+                    <lightning:messages />
+                    <div class="slds-align_absolute-center">
+                        <lightning:button disabled="{!v.disabled}" variant="brand" type="submit" name="save" label="Save" />
+                        <lightning:button disabled="{!v.disabled}" variant="brand" type="Cancel" name="Cancel" label="Cancel"  onclick="{!c.handleCancel}"/> 
+                    </div>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="12" padding="horizontal-small">
+                            <div class="slds-section slds-is-open">
+                                <h3 class="slds-section__title slds-theme_shade">
+                                    <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Order Summary</span>
+                                </h3>
+                            </div>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">
+                            <lightning:inputField disabled="true" fieldName="ChargentOrders__Account__c"            value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Account__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Invoice_Number__c"                  value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Invoice_Number__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">
+                            <aura:if isTrue="{!not(empty(v.ChargentOrders__Payment_Method.Order__c))}">
+                                <lightning:inputField  disabled="true" fieldName="Order__c"       value="{! v.ChargentOrders__Payment_Method.Order__c}"/>
+                            </aura:if>
+                            <aura:if isTrue="{!not(empty(v.ChargentOrders__Payment_Method.WorkOrder__c))}">
+                                <lightning:inputField  disabled="true" fieldName="WorkOrder__c"       value="{! v.ChargentOrders__Payment_Method.WorkOrder__c}"/>
+                            </aura:if>
+                            <lightning:inputField fieldName="ChargentOrders__Date__c"         value="{!v.ChargentOrders__Payment_Method.ChargentOrders__Date__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">
+                            <lightning:inputField fieldName="ChargentOrders__Subtotal__c"       value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Subtotal__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Tax__c"        value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Tax__c }"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">
+                            <lightning:inputField fieldName="ChargentOrders__Order_Note__c"       value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Order_Note__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Gateway__c" aura:id="requiredField" class="Gateway" value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Gateway__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">
+                            <lightning:inputField fieldName="ChargentOrders__Shipping__c"  value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Shipping__c}"/>
+                        </lightning:layoutItem>
+                        
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="12" padding="horizontal-small">
+                            
+                            <div class="slds-section slds-is-open">
+                                <h3 class="slds-section__title slds-theme_shade">
+                                    <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Payment Information</span>
+                                </h3>
+                            </div>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">
+                            <lightning:inputField fieldName="ChargentOrders__Payment_Method__c"             value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Payment_Method__c }"/>
+                            <span/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Charge_Amount__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Charge_Amount__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Manual_Charge__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Manual_Charge__c}"/>
+                        </lightning:layoutItem>
+                        
+                        
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="12" padding="horizontal-small">
+                            <div class="slds-section slds-is-open">
+                                <h3 class="slds-section__title slds-theme_shade">
+                                    <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Credit Card</span>
+                                </h3>
+                            </div>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Card_Type__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Card_Type__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Card_Number__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Card_Number__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Card_Expiration_Month__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Card_Expiration_Month__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Card_Expiration_Year__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Card_Expiration_Year__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Card_Last_4__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Card_Last_4__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Card_Security_Code__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Card_Security_Code__c}"/>
+                        </lightning:layoutItem>
+                        
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="12" padding="horizontal-small">
+                            <div class="slds-section slds-is-open">
+                                <h3 class="slds-section__title slds-theme_shade">
+                                    <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Billing Information</span>
+                                </h3>
+                            </div>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Billing_First_Name__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Billing_First_Name__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Billing_Last_Name__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Billing_Last_Name__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Billing_Address__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Billing_Address__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Billing_Address_Line_2__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Billing_Address_Line_2__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Billing_Company__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Billing_Company__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Billing_Phone__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Billing_Phone__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Billing_City__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Billing_City__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Billing_State__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Billing_State__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Billing_Email__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Billing_Email__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Billing_Fax__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Billing_Fax__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Billing_Zip_Postal__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Billing_Zip_Postal__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Billing_State_Province__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Billing_State_Province__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Billing_Country__c"  aura:id="BillingCountry"        value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Billing_Country__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="12" padding="horizontal-small">
+                            <div class="slds-section slds-is-open">
+                                <h3 class="slds-section__title slds-theme_shade">
+                                    <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Shipping Information</span>
+                                </h3>
+                            </div>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Shipping_First_Name__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Shipping_First_Name__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Shipping_Name__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Shipping_Name__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Shipping_Address__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Shipping_Address__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Shipping_Address_Line_2__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Shipping_Address_Line_2__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Shipping_Company__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Shipping_Company__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Shipping_Phone__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Shipping_Phone__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Shipping_City__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Shipping_City__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Shipping_State__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Shipping_State__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Shipping_Instructions__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Shipping_Instructions__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Tracking_Number__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Tracking_Number__c}"/>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="horizontal-small">                        
+                            <lightning:inputField fieldName="ChargentOrders__Shipping_Zip_Postal__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Shipping_Zip_Postal__c}"/>
+                            <lightning:inputField fieldName="ChargentOrders__Shipping_Country__c"          value="{! v.ChargentOrders__Payment_Method.ChargentOrders__Shipping_Country__c}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <div class="slds-align_absolute-center">
+                        <lightning:button disabled="{!v.disabled}" variant="brand" type="submit" name="save" label="Save" />
+                    </div>
+                </lightning:recordEditForm>
+            </div>
+        </div>
+    </div>
+</aura:component>

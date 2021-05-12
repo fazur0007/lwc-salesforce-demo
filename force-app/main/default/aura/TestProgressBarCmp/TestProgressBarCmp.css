@@ -1,0 +1,54 @@
+.THIS .custom-height{
+    height: 500px;
+}
+
+.THIS .circle {
+    height: 37px;
+    width: 36px;
+    border-radius: 50%;
+    border: 2px solid #1b7a39;
+    display: inline-block;
+}
+
+.THIS .cicrle-top-padding-step{
+    padding-top: 5px;
+}
+
+.THIS .line {
+    background-color: gray;
+    height: 1px;
+    width: 15%;
+    display: inline-block;
+    padding-bottom: 2px;
+}
+
+.THIS .circle-parent{
+    width: 35px;
+    display: inline-grid;
+    white-space: nowrap;
+}
+
+.THIS .stepLabel{
+    padding-top: 5px;
+    color: gray;
+}
+
+.THIS .content{
+    font-size: 25px;
+}
+
+.THIS .activeStep{
+    color: White;
+}
+
+.THIS .activeLabel{
+    color: #1b7a39;
+}
+
+.THIS .activeBackground{
+    background-color: #1b7a39;
+}
+
+.THIS .activeLine{
+    background-color: #1b7a39;
+}

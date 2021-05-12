@@ -1,0 +1,27 @@
+<template>
+    <lightning-layout>
+        
+        <lightning-layout-item flexibility="grow">
+            <p style="font-weight: bold;"  class="slds-text-align_center">Displaying {currentPage} of {totalPage} Page</p>
+        </lightning-layout-item>
+        <lightning-layout-item>
+        <div style="float:right">
+            <lightning-button variant="brand" icon-name="utility:jump_to_left"
+            label="First" disabled={disablePreviousButtons} class="slds-m-top_medium" onclick={handleNavigation} ></lightning-button> &nbsp;
+            <lightning-button label="Previous" 
+            icon-name="utility:left"
+            variant="brand"
+            onclick={previousHandler}
+            disabled={disablePrevious}></lightning-button> &nbsp;
+            <lightning-button label="next" 
+                icon-name="utility:right"
+                icon-position="right"
+                variant="brand"
+                onclick={nextHandler}
+                disabled={disableNext}></lightning-button> &nbsp;
+            <lightning-button variant="brand" label="Last" icon-name="utility:jump_to_right"
+            disabled={disableNextButtons} class="slds-m-top_medium" onclick={handleNavigation} ></lightning-button>
+        </div>
+    </lightning-layout-item>
+    </lightning-layout>
+</template>

@@ -1,0 +1,119 @@
+<aura:component controller="Breville_AccountSearch_CTL" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global" >
+    <aura:attribute name="accounts" type="Account[]" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute type="Boolean" name="showLoader" default="false"/> 
+    <aura:attribute name="openModal" type="boolean" default="false"/>
+    <aura:attribute name="isSelectedNewOrder" type="Boolean" default="false"/>
+    
+    <aura:attribute name="menu"  type="List" default="View,Edit,NewOrder," description="Optional Menu Items"/>
+    <aura:attribute name="issearching"    type="Boolean" default="false"/>
+    
+    <lightning:card title="Find Accounts Based on Email">
+        <div class="search-field">
+            <lightning:layout multipleRows="true" verticalAlign="center" > 
+                <lightning:layoutItem padding="around-small" size="10" class="slds-p-right_x-small">
+                    <span onkeypress="{!c.handleNameFilterChange}">
+                        <lightning:input aura:id="enter-search" type="search" isLoading="{! v.issearching }" placeholder ="Search Email" />
+                    </span>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small" size="2" class="slds-p-right_x-small">                    
+                    <lightning:button label="New Account" variant="brand" onclick="{!c.createAccountRecord }"/>
+                </lightning:layoutItem>
+            </lightning:layout  >
+        </div>
+        <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+        <div class="results">
+            <table  style="table-layout:fixed;width:100%;border-collapse: collapse;height: 40px;" class="slds-table slds-border_left slds-border_right slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                <tr class="slds-text-title_caps">
+                    <th scope="col" style="width:7%;"> 
+                        <strong><div class="slds-truncate">Action</div></strong>
+                    </th>
+                    <th scope="col"> 
+                        <strong><div class="slds-truncate">Account NAME</div></strong>
+                    </th>
+                    <th scope="col">                                        
+                        <strong><div class="slds-truncate">EmailID</div></strong>
+                    </th>
+                    <th scope="col">
+                        <strong><div class="slds-truncate">Phone</div></strong>
+                    </th>                            
+                    <th scope="col">
+                        <strong><div class="slds-truncate">Billing Address</div></strong>
+                    </th>
+                    <th scope="col">
+                        <strong><div class="slds-truncate">ShippingAddress</div></strong>
+                    </th>
+                </tr>
+            </table>
+            <div class="slds-scrollable"  style="overflow:auto;" >
+                <div style="display: block; height: 400px;overflow-y: auto;overflow-x: hidden;">
+                    <table  style="table-layout:fixed;width:101%;border-collapse: collapse;" class="slds-table slds-border_left slds-border_right slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">    
+                        <tbody>
+                            <aura:if isTrue="{!not(empty(v.accounts))}">
+                                <aura:iteration items="{!v.accounts}" var="acc" indexVar="index"> 
+                                    <tr  data-selected-Index="{!index}">
+                                        <td scope="row" style="width:7%;" class="colomnsClass" data-label="sectIdx">
+                                            <lightning:buttonMenu iconName="utility:threedots" aura:id="menu" onselect="{! c.onSelectMenuItem }">
+                                                <lightning:menuItem label="View" value="{!acc.Id + '---' + 'View'}" />
+                                                <lightning:menuItem label="Edit" value="{!acc.Id + '---' + 'Edit'}" />
+                                                <!--<lightning:menuItem label="New Order" value="{!acc.Id + '' + 'NewOrder'}" />-->
+                                            </lightning:buttonMenu>
+                                        </td>
+                                        <td scope="row" class="accountClass" data-label="sectIdx">
+                                            <a href="javascript:void(0)" onclick="{!c.redirectToAccount}" data-attriVal="{!acc.Id}">{!acc.Name}</a>
+                                        </td>
+                                        <td scope="row" title="{!acc.Email_External_ID__c}"  class="colomnsClass" data-label="sectIdx">
+                                            <div class="slds-truncate">{!acc.Email_External_ID__c}</div>
+                                        </td>
+                                        <td scope="row" title="{!acc.Phone}"  class="colomnsClass" data-label="sectIdx">
+                                            <div class="slds-truncate">{!acc.Phone}</div>
+                                        </td>
+                                        <td scope="row"  title="{!acc.BillingAddress.street+' '+acc.BillingAddress.city+' '+acc.BillingAddress.country+' '+acc.BillingAddress.postalCode}"   class="colomnsClass" data-label="sectIdx">
+                                            <div class="slds-truncate">{!acc.BillingAddress.street+' '+acc.BillingAddress.city+' '+acc.BillingAddress.country+' '+acc.BillingAddress.postalCode}</div>
+                                        </td>
+                                        <td scope="row" title="{!acc.ShippingAddress.street+','+acc.ShippingAddress.city+','+acc.ShippingAddress.country+','+acc.ShippingAddress.postalCode}"   class="colomnsClass" data-label="sectIdx">
+                                            <div class="slds-truncate">{!acc.ShippingAddress.street+' '+acc.ShippingAddress.city+' '+acc.ShippingAddress.country+' '+acc.ShippingAddress.postalCode}</div>
+                                        </td>
+                                    </tr>
+                                </aura:iteration>
+                            </aura:if>  
+                        </tbody>
+                    </table>
+                    <aura:if isTrue="{!empty(v.accounts)}">                        
+                        <div class="slds-align_absolute-center slds-box" style="height:4rem;font-size: larger;">No matching records to display</div>
+                    </aura:if>
+                </div>
+            </div>
+        </div>
+        <aura:if isTrue="{!v.isSelectedNewOrder}">
+            <div class="slds-m-around--xx-large">
+                <aura:if isTrue="{!v.openModal}">
+                    <!--Modal Box Start-->
+                    <div role="dialog" class="slds-modal slds-fade-in-open ">
+                        <div class="slds-modal__container">
+                            <div class="slds-modal__header slds-modal__header_empty">
+                                <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.handleCloseModal}">X<span class="slds-assistive-text">Close</span></button>
+                            </div>
+                            <div class="slds-modal__content slds-p-around--medium">
+                                <c:NewOrder recordId="{!v.recordId}"/> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-backdrop slds-backdrop--open"></div>            
+                </aura:if>
+            </div>
+        </aura:if>
+    </lightning:card>
+</aura:component>

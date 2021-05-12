@@ -1,0 +1,321 @@
+.THIS .slds-file-selector__button
+{
+    background-color: #ffffff;
+    color: #6ba235;
+    font-size: 18px;
+    font-weight: bold;
+    width: 100%;
+    height: 45px;
+    border-radius: 8px;
+    border-color: #6ba235;
+}
+
+.THIS .slds-file-selector__dropzone
+{
+    border: none;
+}
+.THIS .slds-file-selector__text
+{
+    display:none;
+}
+
+.THIS .Progress-indicator-font{
+    font-size: 13px;
+    font-family: Arial;
+}
+.THIS .summary-pill .slds-pill__remove{
+    display: none !important;
+}
+.THIS .slds-pill
+{
+    border: none;
+}
+.THIS .circle {
+    height: 37px;
+    width: 36px;
+    border-radius: 50%;
+    border: 2px solid #391538;
+    display: inline-block;
+    text-align:center;
+}
+.THIS .cicrle-top-padding-step{
+    padding-top: 5px;
+    text-align:center;
+}
+.THIS .line {
+    background-color: gray;
+    height: 1px;
+    width: 15%;
+    display: inline-block;
+    padding-bottom: 2px;
+}
+.THIS .circle-parent{
+    width: 35px;
+    display: inline-grid;
+    white-space: nowrap;
+    text-align:center;
+}
+.THIS .stepLabel{
+    padding-top: 5px;
+    color: gray;
+}
+.THIS .content{
+    font-size: 25px;
+}
+.THIS .activeStep{
+    color: White;
+}
+.THIS .activeLabel{
+    color: black;
+    font-weight: bold;
+}
+.THIS .activeBackground{
+    background-color: #391538; 
+}
+.THIS .activeLine{
+    background-color: #1b7a39;
+}
+.THIS .inactiveStep{
+    height: 37px;
+    width: 36px;
+    border-radius: 50%;
+    border: 2px solid lightgrey;
+    display: inline-block;
+    background: whitesmoke;
+    color: lightgrey;
+    text-align:center;
+}
+.THIS.slds-spinner_container {  
+    z-index: 10000;
+    position: fixed;   
+}
+.THIS.Register-your-product{
+    width: 358px;
+    /*height: 44px;*/
+    margin: 0 198px 32px 0;
+    font-family: ArcherSSm-Bold;
+    font-size: 32px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.38;
+    letter-spacing: normal;
+    color: #333333;
+}
+.THIS.PageHeader {
+    
+    height: 32px;
+    /*margin: 39px 147px 16px 441px;*/
+    font-family: ArcherSSm;
+    font-size: 24px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.33;
+    letter-spacing: normal;
+    color: #333333;
+    /* text-align:center;*/
+    
+}
+.THIS .HomeText {
+   /* margin: 16px 444px 25px 441px;*/
+    font-family: Arial;
+    font-size: 14px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.29;
+    letter-spacing: normal;
+    color: #333333;
+}
+
+.THIS .custom-heading_color {
+ color: #666666;
+}
+.THIS .custom-box {
+    color: #6ba235;
+}
+
+.THIS .font_family {
+    font-family: Arial;
+    font-size: 14px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    letter-spacing: normal;
+    color: #333333;
+}
+.THIS .sfdc_button_breville {
+    font-family: "Arial";
+    margin: 36px auto 33px auto;
+    display: block;
+    color: #ffffff;
+    background-color: #6ba235;
+    border-radius: 8px;
+    text-align: center;
+    padding: 10px 32px;
+    font-size: 18px;
+    font-weight: bold;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    /*width: 140px;*/
+    height: 52px;
+}
+
+.THIS .sfdc_big_button_breville {
+    font-family: "Arial";
+    margin: 36px auto 33px auto;
+    color: #ffffff;
+    background-color: #6ba235;
+    border-radius: 8px;
+    text-align: center;
+    padding: 10px 32px;
+    font-size: 18px;
+    font-weight: bold;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    /*width: 240px;*/
+    height: 52px;
+}
+.THIS .sfdc_tool_tip_top{
+    
+}
+.THIS .sfdc_right_margin{
+    
+}
+.THIS .sfdc_max_width_root{
+}
+.THIS .sfdc_cmp_root_div{
+   
+}
+.THIS .sfdc_input_box_div{
+   
+}
+.THIS .sfdc_root_div_width{
+}
+.THIS .sfdc_root_div_left{
+    
+}
+.THIS .sfdc_next_button_root_div_left{
+    
+}
+.THIS .sfdc_back_button_root_div_left{
+    
+}
+.THIS .sfdc_summary_edit_button {
+    font-size: 16px; 
+    font-family: Arial; 
+    font-weight: bold; 
+}
+.THIS .sfdc_tool_tip_bottom{
+    margin-top: -1.5%;
+}
+.THIS .sfdc_tool_tip_top_icon{
+    margin-top: 1.4%;
+    font-family:Arial;    
+    color:#6da439;
+    /*z-index: 10;*/
+}
+.THIS.slds_responsive {
+    
+}
+.THIS .sfdc_text_size_responsive{
+    font-size : 14px;
+}
+.THIS .sfdc_text_process_indicator_responsive{
+    margin-left: -12%;
+}
+@media screen and (max-width: 300px) {
+    .THIS.slds_responsive {
+        width: 260px;
+    } 
+    .THIS.sfdc_button_breville{
+        width: 80%;
+    }
+    .THIS .sfdc_text_size_responsive{
+    font-size : 10px;
+}
+}
+@media screen and (min-width: 301px) and (max-width: 555px) {
+    .THIS.slds_responsive {
+        width: 98%;
+    } 
+    .THIS .sfdc_text_size_responsive{
+    font-size : 11px;
+}
+}
+@media screen and (min-width:800px) {
+    .THIS.slds_responsive {
+        width: 800px;
+        align-content: center;        
+    } 
+    .THIS .sfdc_text_size_responsive{
+    
+   }
+}
+
+.THIS .anchorStyle{
+    font-family:Arial;
+    color:#6da439;
+    font-weight:bold;
+}
+.THIS .sfdc_tool_tip_top_inner_div{
+    margin-top: .6%;
+}
+.THIS .container {
+    width:100px;
+    height:100px;
+    overflow:hidden;
+    display:block;
+}
+.THIS .container div {
+    display:inline-block;
+    position:relative;
+    float:left;
+}
+.THIS .sfdc_file_upload_div{
+    min-height: 37px;
+    max-height: 50px;
+    min-width:43px;
+    max-width:62px;
+}
+.THIS .slds-form-element__label
+{
+    font-size: 14px  !important;
+    font-family: Arial !important;
+    font-weight: bold !important;
+    color: black !important; 
+}
+.THIS .noAsterisk .slds-required {
+    display: none;
+}
+
+
+.THIS .borderValue {
+    border: 0px;
+}
+
+.THIS .p .Thank_You_Header {
+    text-align: left;
+    font-size:100%;
+}
+
+.THIS .Thank_You_Content {
+    text-align: left; 
+}
+
+.THIS .Back_to_Breville_home {
+    background-color: #6ba235;
+}
+
+.THIS.changeStyle {
+    background-color:blue;
+    color:red;
+}
+
+.THIS .back_to_home {
+    margin: 0px; 
+    width: 32%;
+}

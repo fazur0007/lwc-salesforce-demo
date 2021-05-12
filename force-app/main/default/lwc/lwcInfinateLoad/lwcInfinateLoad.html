@@ -1,0 +1,10 @@
+<template>
+<div style="height: 15rem;">
+    <lightning-datatable key-field="Id"
+                            columns={tableColumns}
+                            data={data}
+                            enable-infinite-loading={isLoaded}
+                            onloadmore={onLoadMoreHandler}>
+    </lightning-datatable>
+</div>
+</template>

@@ -1,0 +1,6 @@
+<aura:component >
+    <aura:attribute name="message" type="String" />
+	<aura:registerEvent name="eventonchild" type="c.TestComponentEventEvent"></aura:registerEvent>
+    <lightning:input name="input2" label="Text field with predefined value" value="{!v.message}"/>
+    <lightning:button variant="base" label="Base" title="Base action" onclick="{! c.handleClick }"/>    
+</aura:component>

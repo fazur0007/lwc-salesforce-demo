@@ -1,0 +1,152 @@
+<aura:component controller="LightningSelfRegisterController"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable"
+                access="global" >
+    <aura:attribute name="selfRegisterUrl" type="String" required="false" default="/SelfRegister"/>
+    <aura:attribute name="LoginUrl" type="String" access="private"/> 
+    <aura:attribute name="You_have_entered_an_invalid_format" type="String"/>
+    <aura:attribute name="termsandconditionsUrl" type="String" access="private"/>
+    <aura:attribute name="policyUrl" type="String" access="private"/>
+    <aura:attribute name="termsandconditionsUrl_beanz" type="String" access="private"/>
+    <aura:attribute name="policyUrl_beanz" type="String" access="private"/>
+    <aura:attribute name="accountId" type="String" required="false" description="accountId for creating the user. If not specified, it will create a PersonAccount if possible for B2C scenario. Or otherwise if it's in a community, the community's self-registration accountId will be used."/>
+    <aura:attribute name="regConfirmUrl" type="String" required="false"/> 
+    <aura:attribute name="startUrl" type="String" required="false" description="The url you go to after a successful login" />
+    <aura:attribute name="showError" type="Boolean" required="true" description="" default="false" access="private"/>
+    <aura:attribute name="showSucess" type="Boolean" required="true" description="" default="false" access="private"/>
+    <aura:attribute name="errorMessage" type="String" required="false" description="" access="private"/>
+    <aura:attribute name="firstnameLabel" type="String" required="false"/>
+    <aura:attribute name="lastnameLabel" type="String" required="false"/>    
+    <aura:attribute name="emailLabel" type="String" required="false"/>
+    <aura:attribute name="passwordLabel" type="String" required="false"/>
+    <aura:attribute name="confirmPasswordLabel" type="String" required="false"/>    
+    <aura:attribute name="submitButtonLabel" type="String" required="false"/>
+    <aura:attribute name="includePasswordField" type="Boolean" required="false" default="false" description="Whether to include password"/>    
+    <aura:attribute name="extraFieldsFieldSet" type="String" required="false" description="A field set name whose fields are desired for user registration"/>
+    <aura:attribute name="extraFields" type="list" required="false" description="A field set name whose fields are desired for user registration"/>
+    <aura:attribute name="submitButtonTitle" type="String"/> 
+    <aura:attribute name="Already_have_a_Beanz_or_Breville_account" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    <aura:attribute name="expid" type="String" required="false"  description="The branding experience ID" />        
+    <aura:registerevent name="sitePropagatedStartUrl" type="c:setStartUrl"/>
+    <aura:dependency resource="c:setStartUrl" type="EVENT"/>
+    <aura:attribute name="redirecturi" type="String" default="Nourl"/>
+    <aura:attribute name="urlstate" type="String" default="Nourl"/>
+    <aura:attribute name="showpassword" type="Boolean" default="false"/> 
+    <aura:attribute name="showTermsAndConditions" type="Boolean" default="false"/>
+    <aura:dependency resource="siteforce:registerQueryEventMap" type="EVENT"/>
+    
+    <aura:handler event="c:setStartUrl" action="{!c.setStartUrl}"/> 
+    <aura:handler event="c:setExpId" action="{!c.setExpId}"/>    
+    <aura:dependency resource="c:setExpId" type="EVENT"/> 
+    
+    
+    <aura:attribute name="Enter_email_address" type="String"/>
+    <aura:attribute name="Enter_password" type="String"/>
+    <aura:attribute name="Create_Account" type="String"/>
+    <aura:attribute name="Welcome_to" type="String"/> 
+    <aura:attribute name="Create_Account_Button_Label" type="String"/>
+    <aura:attribute name="Password" type="String"/>
+    <aura:attribute name="Continue" type="String"/>
+    <aura:attribute name="Email" type="String"/>
+    <aura:attribute name="Username" type="String"/>
+    <aura:attribute name="Min_6_characters_1_number" type="String"/>    
+    <aura:attribute name="Already_a_Breville_member" type="String"/>
+    <aura:attribute name="Create_Acct_Consent_Mesg_Part_1" type="String"/>
+    <aura:attribute name="Create_Acct_Consent_Mesg_Part_2" type="String"/>
+    <aura:attribute name="Create_Acct_Consent_Mesg_Part_3" type="String"/>
+    <aura:attribute name="Create_Acct_Consent_Mesg_Part_2_Beanz" type="String"/>
+    <aura:attribute name="terms_and_conditions" type="String"/>
+    <aura:attribute name="Login_Here" type="String"/>
+    <aura:attribute name="Login_Label" type="String"/>
+    <aura:attribute name="Privacy_Policy" type="String"/>
+    <aura:attribute name="dynamicLogo" type="String" default=""/>
+    <aura:attribute name="dynamicVariant" type="String" default=""/>
+
+    <aura:if isTrue="{!v.dynamicLogo=='Breville'}">
+        <div style="box-sizing: border-box;font-size: 14px;color: rgb(3, 3, 3);box-sizing: border-box;width: 250px !important;max-width: 45% !important;height: auto;vertical-align: middle;border: 0;text-align: left !important;font-family: CircularStd-Medium;font-size: 14px;color: rgb(3, 3, 3);line-height: 1.5;">
+            <img src="{!$Resource.BrevilleLogo}" alt="Breville company logo"></img>
+        </div>
+        <div style="background-color: #624368; width: 24px; height: 4px; margin: 11px 0 24px" />
+    </aura:if>
+    <aura:if isTrue="{!v.dynamicLogo=='beanz'}">   
+        <div style="width: 320px;height: 28px;font-size: 32px;line-height: 28px;letter-spacing: -0.5px;color: #a25e41;font-family: Bitter-Bold;"> {!v.Welcome_to}</div><br/>
+        <div style="box-sizing: border-box;font-size: 14px;color: rgb(3, 3, 3);box-sizing: border-box;width: 250px !important;max-width: 45% !important;height: auto;vertical-align: middle;border: 0;text-align: left !important;font-family: CircularStd-Medium;font-size: 14px;color: rgb(3, 3, 3);line-height: 1.5;">
+            <img src="{!$Resource.Beanz}" alt="Beanz company logo"></img>
+        </div>
+        <br/>
+        <div style="width: 320px;height: 0px;font-size: 20px;line-height: 28px;letter-spacing: -0.5px;color: #a25e41;font-family: Bitter-Bold;">{!v.Create_Account}</div>
+    </aura:if>
+    <aura:if isTrue="{!v.dynamicLogo=='app'}">
+        <div style="box-sizing: border-box;font-size: 14px;color: rgb(3, 3, 3);box-sizing: border-box;width: 250px !important;max-width: 45% !important;height: auto;vertical-align: middle;border: 0;text-align: left !important;font-family: CircularStd-Medium;font-size: 14px;color: rgb(3, 3, 3);line-height: 1.5;">
+            <img src="{!$Resource.BrevilleLogo}" alt="Breville company logo"></img>
+        </div>
+        <div style="background-color: #624368; width: 24px; height: 4px; margin: 11px 0 24px" />
+    </aura:if>   
+    <aura:if isTrue="{!v.dynamicLogo=='sage'}">
+        <div style="box-sizing: border-box;font-size: 14px;color: rgb(3, 3, 3);box-sizing: border-box;width: 250px !important;max-width: 45% !important;height: auto;vertical-align: middle;border: 0;text-align: left !important;font-family: CircularStd-Medium;font-size: 14px;color: rgb(3, 3, 3);line-height: 1.5;">
+            <img src="{!$Resource.SageLogo}" style="width:81%;margin-top:15px"></img>
+        </div>
+        <div style="background-color: #624368; width: 30px; height: 4px; margin: 4px 0 24px" /> 
+    </aura:if>  
+    
+    <div aura:id="bodydiv">
+        <div aura:id="headerh1">{!v.dynamicLogo=='beanz'? '' : v.Create_Account}</div>
+        <br/>
+        <div aura:id="divAlrMem">{!v.dynamicLogo=='beanz'? v.Already_have_a_Beanz_or_Breville_account : v.Already_a_Breville_member} &nbsp;            
+            <a aura:id="divLoginHere" class="csRed underline" href="{!if(v.LoginUrl == null, v.selfRegisterUrl, v.LoginUrl)}">
+                {!v.dynamicLogo=='beanz'? v.Login_Label : v.Login_Here}
+            </a>
+        </div>
+        <br />
+        <aura:renderIf isTrue="{!v.showError}">
+            <div id="error">
+                <ui:outputRichText value="{!v.errorMessage}"/>
+            </div>
+        </aura:renderIf>
+        <aura:renderIf isTrue="{!v.showSucess}">
+            <div id="success">
+                <ui:outputRichText value="{!v.errorMessage}"/>
+            </div>
+        </aura:renderIf>
+        <div id="sfdc_email_container" class="sfdc">
+            <span id="sfdc_user" class="login-icon" data-icon="k"></span>
+            <span onkeypress="{!c.onKeyUp}">
+                <lightning:input messageWhenTypeMismatch="{!v.You_have_entered_an_invalid_format}" name="email" type="email" class="input sfdc_usernameinput sfdc" aura:id="email" placeholder="{!v.dynamicLogo=='beanz'? v.Email :v.Enter_email_address}" label="{!v.Email}" variant="{!v.dynamicVariant}"/>
+            </span>
+        </div>
+
+        <aura:renderIf isTrue="{!v.includePasswordField}">
+            <div id="sfdc_password_container" class="sfdc slds-input-has-icon slds-input-has-icon--right">
+                <span id="sfdc_lock" class="login-icon sfdc" data-icon="c"></span>
+                <span onkeypress="{!c.doSubmit}">
+                    <lightning:input type="{!v.showpassword ? 'text':'password'}" name="password" aura:id="password" placeholder="{!v.dynamicLogo=='beanz'? v.Password :v.Enter_password}" label="{!v.Password}" value="" class="input sfdc_usernameinput sfdc" variant="{!v.dynamicVariant}"/>
+                    <lightning:buttonIcon class="slds-button slds-input__icon slds-text-color--default" 
+                                          iconName="{!v.showpassword ? 'utility:hide':'utility:preview'}" 
+                                          alternativeText="{!v.coborrowerSSNCB ? 'Hide':'Show'}" 
+                                          onclick="{!c.togglePassword}"/>
+                </span>
+                <span aura:id="passwordStrengthLabel" style="color: #9c9c9c; font-size: 14px;">{!v.Min_6_characters_1_number}</span>
+                
+            </div>
+        </aura:renderIf>   
+        <aura:if isTrue="{!v.dynamicLogo=='beanz'}">
+            <br/>
+        </aura:if>
+        <div aura:id="termsAndConds">{!v.Create_Acct_Consent_Mesg_Part_1}&nbsp;
+            <a aura:id="hyperLinkTandC" href="{!v.dynamicLogo=='beanz'?v.termsandconditionsUrl_beanz:v.termsandconditionsUrl}"  
+            target="_blank" rel="noopener noreferrer">{!v.terms_and_conditions}</a>&nbsp;
+            {!v.dynamicLogo=='beanz'? v.Create_Acct_Consent_Mesg_Part_2_Beanz : v.Create_Acct_Consent_Mesg_Part_2}&nbsp;
+            <a aura:id="hyperLinkPolicy" href="{!v.dynamicLogo=='beanz'? v.policyUrl_beanz:v.policyUrl}" 
+            target="_blank" rel="noopener noreferrer">{!v.Privacy_Policy}</a>&nbsp;
+            {!v.Create_Acct_Consent_Mesg_Part_3}
+        </div>
+        <div class="sfdc">
+            <center>
+                <lightning:button aura:id="submitButton" class="sfdc_button"  title="{!v.submitButtonTitle}" 
+                                  label="{!v.dynamicLogo=='beanz'? v.Create_Account_Button_Label : v.Continue}" 
+                                  onclick="{! c.handleSelfRegister }"/>
+            </center>
+        </div>
+    </div>    
+</aura:component>

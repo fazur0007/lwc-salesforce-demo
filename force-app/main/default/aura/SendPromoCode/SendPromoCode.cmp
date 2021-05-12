@@ -1,0 +1,4 @@
+<aura:component  implements="force:hasRecordId,force:lightningQuickActionWithoutHeader" 
+access="global">
+    <c:lwcSendPromoCode recordId="{!v.recordId}" ></c:lwcSendPromoCode>
+</aura:component>

@@ -1,0 +1,39 @@
+.THIS .sfdc_button_breville {
+    font-family: "Arial";
+    margin: 36px auto 33px auto;
+    display: block;
+    color: #ffffff;
+    background-color: #6ba235;
+    border-radius: 8px;
+    text-align: center;
+    padding: 10px 32px;
+    font-size: 22px;
+    font-weight: bold;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    width: 100%;
+}
+.THIS .sfdc_button_breville:hover{
+    color: #6ba235;
+    background-color: #ffffff;
+    border-color: #6ba235;
+}
+.THIS body {
+    color: #4f4f4f;
+    box-sizing: border-box;
+}
+.THIS .slds-form-element__label
+{
+    font-size: 18px  !important;
+    font-weight: bold !important;
+    color: black !important; 
+}
+.THIS .h1class_breville {
+    font-size: 24px !important;
+    font-family: "Arial" !important;
+    color: #3d3d3d !important;
+}
+.THIS p {
+    font-size: 18px;
+}

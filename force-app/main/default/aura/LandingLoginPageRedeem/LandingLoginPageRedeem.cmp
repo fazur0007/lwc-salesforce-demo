@@ -1,0 +1,14 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+	<div class="slds-align_absolute-center">
+    <h1 class="slds-card__header-title slds-text-heading_large">
+		Log in for faster registration or Sign Up to track your order
+    </h1>
+    </div> 
+    <div>
+    <!-- Brand-outline variant: Identifies the primary action in a group of buttons, but has a lighter look -->
+    <lightning:button class="sfdc_button_breville" label="Login" title="Login" onclick="{!c.buttonFunction}" />
+	
+    <!-- Brand-outline variant: Identifies the primary action in a group of buttons, but has a lighter look -->
+    <lightning:button class="sfdc_button_breville" label="Create Account" title="Create Account" onclick="{!c.goBackOnProductRegister}" />
+    </div>
+</aura:component>

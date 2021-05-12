@@ -1,0 +1,345 @@
+<aura:component controller="Ltng_AwsS3SearchArticlesController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="itemOptions" type="List" default="[]" />
+    <aura:attribute name="lstSelectedRecords" type="List" default="[]"/>
+    <aura:handler   name="init" value="{!this}" action="{!c.doInit}" />    
+    <aura:attribute name="listOfSearchRecords" type="List" />
+    <aura:attribute name="SearchKeyWord" type="string"/>
+    <aura:attribute name="searchString" type="string" default=""/>
+    <aura:attribute name="Message" type="String" default=""/>   
+    <aura:attribute name="selectedDocTypeValue" type="String"/>
+    <aura:attribute name="downloadURL" type="String" default=""/>
+    
+    <aura:attribute name="selectedRegionValue" type="String"/>
+    <aura:attribute name="regionOptions" type="List" default="[]"/> 
+    <aura:attribute name="docOptions" type="List" default="[]"/> 
+    <aura:attribute name="data" type="Object"/>
+    <lightning:navigation aura:id="navService"/>
+    
+    <aura:attribute name="allData" type="List"/>
+    <aura:attribute name="currentPageNumber" type="Integer" default="1"/>
+    <aura:attribute name="pageSize" type="Integer" default="4"/>
+    <aura:attribute name="totalPages" type="Integer" default="0"/>
+    <aura:attribute name="pageList" type="List"/>
+    <aura:attribute name="issearching"    type="Boolean" default="false"/>
+    <aura:attribute type="Boolean" name="showLoader" default="true"/>
+    <aura:attribute type="Boolean" name="isDownloadView" default="false"/>
+    <aura:attribute access="global" name="pdfData" type="String"/>    
+    
+    <!--<ltng:require styles="/resource/slds_resource/assets/styles/salesforce-lightning-design-system.css?v=1" /> -->
+    <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <div class="slds-box slds-card">
+        <lightning:layout multipleRows="true" horizontalAlign="center">
+            <lightning:layoutItem padding="around-small" size="12">
+                <div class="slds-box slds-card" style="color:black !important;">
+                    <lightning:layout>
+                        <lightning:layoutItem padding="around-small" size="2">
+                            <span onkeypress="{!c.keyCheck}" class="slds-size--11-of-12">
+                                <lightning:input placeholder="Knowledge Base"
+                                                 name="inline-search-input"
+                                                 label="Search Knowledge Base"
+                                                 type="search"
+                                                 aura:id="enter-search"
+                                                 isLoading="{! v.issearching }"
+                                                 />
+                            </span>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem padding="around-small" size="2">
+                            <lightning:select name="fieldId" label="DocType" aura:id="DocTypeId" value="{!v.selectedDocTypeValue}">
+                                <aura:iteration items="{!v.docOptions}" var="option">
+                                    <option text="{!option.label}" value="{!option.id}" />
+                                </aura:iteration>
+                            </lightning:select>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem padding="around-small" size="2">
+                            <lightning:select name="fieldId" label="Region" aura:id="RegionId" value="{!v.selectedRegionValue}">
+                                <aura:iteration items="{!v.regionOptions}" var="option">
+                                    <option text="{!option.label}" value="{!option.id}" />
+                                </aura:iteration>
+                            </lightning:select>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem padding="around-small" size="3">
+                            <div onmouseleave="{!c.onblur}"  aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close">
+                                <label class="slds-form-element__label">Products</label>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-input-has-icon slds-input-has-icon--right">
+                                        <div aura:id="lookup-pill" class="slds-pill-container">
+                                            <div aura:id="lookupField" class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"  style="width: 100%;">
+                                                
+                                                <ui:inputText click="{!c.onfocus}"
+                                                              updateOn="keyup"
+                                                              keyup="{!c.keyPressController}"
+                                                              class="slds-lookup__search-input slds-input inputSize"
+                                                              value="{!v.SearchKeyWord}"
+                                                              placeholder="Product Filter"/>  
+                                            </div> 
+                                            
+                                            <aura:iteration items="{!v.lstSelectedRecords}" var="sr">
+                                                <lightning:pill class="slds-m-around_xx-small" label="{!sr.label}" name="{!sr.value}" onremove="{! c.clear }">
+                                                    <aura:set attribute="media">
+                                                        <lightning:icon iconName="standard:account" size="x-small" alternativeText="icon"/>
+                                                    </aura:set>
+                                                </lightning:pill>
+                                            </aura:iteration>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul style="min-height:40px;margin-top:0px !important" class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-lookup__menu slds" role="listbox">
+                                    <lightning:spinner class="slds-hide" variant="brand" size="small" aura:id="mySpinner"/>
+                                    <center> {!v.Message}</center>
+                                    <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec">
+                                        <li role="presentation" class="slds-listbox__item" data-value="{!singleRec.value}" data-label="{!singleRec.label}" 
+                                            onclick="{!c.selectRecord}">
+                                            <span id="listbox-option-unique-id-01" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                <span class="slds-media__figure">
+                                                    <span class="slds-icon_container" title="Description of icon when needed">
+                                                        <lightning:icon iconName="standard:account" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                                                    </span>
+                                                </span>    
+                                                <span class="slds-media__body">  
+                                                    <span class="slds-listbox__option-text slds-listbox__option-text_entity">{!singleRec.label}</span>
+                                                </span>
+                                            </span>
+                                        </li>
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem class="buttonclass"  padding="around-small" size="3">
+                            <lightning:button variant="brand" label="Search" title="Search" onclick="{! c.doSearch }" />
+                            <!--<lightning:button label="Clear Filters" variant="brand" onclick="{!c.handleClearFilters }"/> -->
+                        </lightning:layoutItem>                        
+                    </lightning:layout>
+                </div>
+                <br/>
+                <table  style="table-layout:fixed;width:100%;border-collapse: collapse;" class="slds-table slds-border_left slds-border_right slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                    <!--<caption class="slds-headertab-sty">Corporate Traveller Onboarding</caption>-->
+                    <tr class="slds-text-title_caps">
+                        <th scope="col"> 
+                            <strong><div class="slds-truncate">Knowledge Base ID</div></strong>
+                            <!--<div onkeyup="{! c.searchKKnowledge }">
+                                <lightning:input type="text" 
+                                                 aura:id="KnowledgeName" 
+                                                 placeholder="Knowledge ID"
+                                                 name="KnowledgeName"
+                                                 />
+                            </div>-->
+                        </th>
+                        <th scope="col">                                        
+                            <strong><div class="slds-truncate">Title</div></strong>
+                            <!--<div onkeyup="{! c.searchTitle }">
+                                <lightning:input  type="text"  
+                                                 aura:id="titleName"
+                                                 placeholder="Title"
+                                                 name="titleName"
+                                                 />
+                            </div>-->
+                        </th>
+                        <th scope="col">
+                            <strong><div class="slds-truncate">Description</div></strong>
+                            <!--<div onkeyup="{! c.searchDescription }">
+                                <lightning:input  disabled="true"
+                                                 type="text"  
+                                                 aura:id="descriptionName" placeholder="Description"
+                                                 name="descriptionName"
+                                                 />
+                            </div>-->
+                        </th>                            
+                        <th scope="col">
+                            <strong><div class="slds-truncate">Region</div></strong>
+                            <!--<div onkeyup="{! c.searchRegion }">
+                                <lightning:input  type="text"  
+                                                 aura:id="regionName" 
+                                                 placeholder="Region"
+                                                 name="regionName"
+                                                 />
+                            </div>-->                                   
+                        </th>
+                        <th scope="col">
+                            <strong><div class="slds-truncate">Product</div></strong>
+                            <!--<div onkeyup="{! c.searchProduct }">
+                                <lightning:input type="text"  
+                                                 aura:id="productName" 
+                                                 placeholder="Product"
+                                                 name="productName"
+                                                 />
+                            </div>-->
+                        </th>
+                        <th scope="col">
+                            <strong><div class="slds-truncate">Doc Type</div></strong>
+                            <!--<div onkeyup="{! c.searchDoctype }">
+                                <lightning:input type="text"  
+                                                 aura:id="docType" 
+                                                 placeholder="Doc Type"
+                                                 name="docType"
+                                                 /> 
+                            </div>-->
+                        </th>
+                        <th scope="col"> 
+                            <strong><div class="slds-truncate">Download Link</div></strong>
+                            <!--<div onkeyup="{! c.searchDownloadLink }">
+                                <lightning:input  type="text" 
+                                                 disabled="true" 
+                                                 aura:id="downloadLink" 
+                                                 placeholder="Download Link"
+                                                 name="downloadLink"
+                                                 />
+                            </div>-->
+                        </th>
+                        <th scope="col">
+                            <strong><div class="slds-truncate">Out of Date</div></strong>
+                            <!--<div onkeyup="{! c.searchOutOfDate }">
+                                <lightning:input type="search"  
+                                                 disabled="true" 
+                                                 aura:id="outOfDate" 
+                                                 placeholder="Out of Date"
+                                                 name="outOfDate"
+                                                 />      
+                            </div>-->
+                        </th>
+                        <th scope="col">  
+                            <strong><div class="slds-truncate">New Knowledge Base</div></strong>  
+                            <!--<div onkeyup="{! c.searchNewKnowledgeName }">
+                                <lightning:input type="text"  
+                                                 disabled="true" 
+                                                 aura:id="newKnowledgeName" 
+                                                 placeholder="New Knowledge Base"
+                                                 name="newKnowledgeName"
+                                                 /> 
+                            </div>-->
+                        </th>
+                    </tr>
+                </table>
+                <div class="slds-scrollable"  style="overflow:auto;" >
+                    <div style="display: block; height: 200px;overflow-y: auto;overflow-x: hidden;">
+                        <table  style="table-layout:fixed;width:101%;border-collapse: collapse;" class="slds-table slds-border_left slds-border_right slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">    
+                            <tbody>
+                                <aura:if isTrue="{!not(empty(v.data))}">
+                                    <aura:iteration items="{!v.data}" var="acc" indexVar="index"> 
+                                        <tr  data-selected-Index="{!index}">
+                                            <td scope="row" class="knwClass" data-label="sectIdx">
+                                                <a href="javascript:void(0)" style="color:#ff5f00;" onclick="{!c.redirectToRecord}" data-attriVal="{!acc.Id}">{!acc.Name}</a>
+                                            </td>
+                                            <td scope="row"  class="colomnsClass" data-label="sectIdx">
+                                                <div class="slds-truncate" title="{!acc.Title__c}">{!acc.Title__c}</div>
+                                            </td>
+                                            <td scope="row"   class="colomnsClass" data-label="sectIdx">
+                                                <div class="slds-truncate" title="{!acc.Description__c}">{!acc.Description__c}</div>
+                                            </td>
+                                            <td scope="row"    class="colomnsClass" data-label="sectIdx">
+                                                <div class="slds-truncate" title="{!acc.Region__c}">{!acc.Region__c}</div>
+                                            </td>
+                                            <td scope="row"   class="colomnsClass" data-label="sectIdx">
+                                                <a href="javascript:void(0)" style="color:#ff5f00;" onclick="{!c.redirectToRecord}" data-attriVal="{!acc.Product__c}">{!acc.Product__r.Name}</a>
+                                            </td>
+                                            <td scope="row"   class="colomnsClass" data-label="sectIdx">
+                                                <div class="slds-truncate" title="{!acc.DocType__c}">{!acc.DocType__c}</div>
+                                            </td>
+                                            <td scope="row" class="knwClass" data-label="sectIdx">
+                                                <aura:if isTrue="{!not(empty(acc.DownloadLink__c))}">
+                                                    <a href="javascript:void(0)" style="color:#ff5f00;" onclick="{! c.downloadAWSStorage }" data-attriVal="{!acc.DownloadLink__c}"></a>
+                                                    <aura:unescapedHtml value="{!acc.DownloadLink__c}" />
+                                                </aura:if>
+                                            </td>
+                                            <td scope="row"   class="colomnsClass" data-label="sectIdx">
+                                                <div class="slds-truncate" title="{!acc.isOutOfDate__c}">{!acc.isOutOfDate__c}</div>
+                                            </td>
+                                            <td scope="row"   class="colomnsClass" data-label="sectIdx">
+                                                <a href="javascript:void(0)" style="color:#ff5f00;" onclick="{!c.redirectToRecord}" data-attriVal="{!acc.New_Knowledge_Base__c}">{!acc.New_Knowledge_Base__r.Name}</a>
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </aura:if>  
+                            </tbody>
+                        </table>
+                        <aura:if isTrue="{!v.isDownloadView}">
+                            <aura:html tag="style">
+                                .cuf-content {
+                                padding: 0 0rem !important;
+                                }
+                                .slds-p-around--medium {
+                                padding: 0rem !important;
+                                }       
+                                .slds-modal__content{
+                                overflow-y: hidden !important;
+                                height: unset !important;
+                                max-height: 130rem !important;
+                                max-width: 130rem !important;
+                                width: 100% !important;
+                                height: 100% !important;
+                                margin: 0 auto;
+                                }
+                                .slds-modal__container{
+                                width: 60% !important;
+                                max-width: 100rem !important;
+                                min-width: 40rem !important;
+                                max-height: 100rem !important;
+                                min-height: 40rem !important;
+                                height: 100% !important;
+                                }
+                            </aura:html>
+                            <div class="slds-m-around--xx-large">
+                                <div role="dialog" class="slds-modal slds-fade-in-open ">
+                                    <div class="slds-modal__container">
+                                        <div class="slds-modal__header slds-modal__header_empty">
+                                            <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.handleCloseModal}">
+                                                X
+                                                <span class="slds-assistive-text">Close</span>
+                                            </button>
+                                        </div>
+                                        <lightning:card>
+                                            <iframe src="{!v.downloadURL}" width="100%" height="500px;" frameBorder="0"  class="pdfFrame" onload="{!c.loadpdf}"/>
+                                        </lightning:card>
+                                    </div>
+                                </div>
+                                <div class="slds-backdrop slds-backdrop--open"></div>            
+                            </div>
+                        </aura:if>
+                        <aura:if isTrue="{!empty(v.data)}">
+                            <div class="slds-align_absolute-center" style="height:5rem"><b>Please Select a Product or Search the Knowledge Base !</b></div>
+                        </aura:if>
+                    </div>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small" flexibility="auto">
+                <aura:if isTrue="{!not(empty(v.data))}">
+                    <lightning:button label="First" iconName="utility:left" iconPosition="left" variant="brand"
+                                      onclick="{!c.onFirst}" disabled="{! v.currentPageNumber == 1}"/>
+                    <lightning:button  label="Previous" iconName="utility:left" iconPosition="left" variant="brand"
+                                      onclick="{!c.onPrev}" disabled="{! v.currentPageNumber == 1}"/>               
+                    <span class="slds-p-horizontal_x-small">
+                        <a onclick="{!c.processMe}" name="1" 
+                           class="{! (v.currentPageNumber == 1) ? 'slds-button slds-button_brand' : 'slds-button slds-button_neutral'}">1</a>
+                    </span>
+                    <aura:iteration items="{!v.pageList}" var="item">
+                        <span class="slds-p-horizontal_x-small"> 
+                            <a onclick="{!c.processMe}" name="{!item}"
+                               class="{! (v.currentPageNumber == item) ? 'slds-button slds-button_brand' : 'slds-button slds-button_neutral'}">{!item}</a>
+                        </span>
+                    </aura:iteration>                
+                    <span class="slds-p-horizontal_xxx-small">
+                        <a>...</a>
+                    </span>
+                    <span class="slds-p-horizontal_x-small">
+                        <a onclick="{!c.processMe}" name="{!v.totalPages}"
+                           class="{! (v.currentPageNumber == v.totalPages) ? 'slds-button slds-button_brand' : 'slds-button slds-button_neutral'}">{!v.totalPages}</a>
+                    </span>                
+                    <lightning:button label="Next"  iconName="utility:right" iconPosition="right" variant="brand"
+                                      disabled="{! v.currentPageNumber == v.totalPages}" onclick="{!c.onNext}"/>
+                    <lightning:button label="Last" iconName="utility:right" iconPosition="right" variant="brand"
+                                      disabled="{! v.currentPageNumber == v.totalPages}" onclick="{!c.onLast}"/>
+                </aura:if>
+            </lightning:layoutItem>
+            
+        </lightning:layout>
+    </div>
+</aura:component>

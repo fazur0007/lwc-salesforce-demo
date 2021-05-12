@@ -1,0 +1,40 @@
+<template>
+    <template if:true={showLoader} >
+        <div class="slds-spinner_container">
+            <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </template>
+    <template if:false={showLoader}>
+        <template if:true={caseRecord}>
+            <lightning-card  title={titleLabel} icon-name="standard:case">
+                <lightning-record-edit-form
+                        id="recordViewForm"
+                        record-id={recordId}
+                        record-type-id={rtId}
+                        object-api-name="Case"
+                        onsuccess={navigateToCaseRecord}
+                        onsubmit={handlesubmit}>
+                
+                    <p class="slds-var-p-horizontal_medium" if:true={showBrand}>
+                        <lightning-messages></lightning-messages>
+                        <lightning-input-field field-name={discountCodeField} required></lightning-input-field>
+                    </p>
+                    <p class="slds-align_absolute-center">
+                        <lightning-button label="Cancel" 
+                                          title="Cancel" 
+                                          onclick={navigateToCaseRecord} class="slds-var-m-around_medium"></lightning-button> 
+                        <lightning-button id="submit"
+                                        type="submit"
+                                        label="OK"
+                                        variant="success"
+                                        class="slds-var-m-around_medium" ></lightning-button>
+                    </p>
+                </lightning-record-edit-form>
+            </lightning-card>
+        </template>
+    </template>
+</template>

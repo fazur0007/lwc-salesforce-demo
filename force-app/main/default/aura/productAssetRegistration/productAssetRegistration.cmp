@@ -1,0 +1,72 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global" controller="registrationController" >
+    <aura:attribute name="fieldMap" type="Map"/>
+    <aura:attribute name="statefieldMap" type="Map"/>
+    <aura:attribute name="showAccountAsset" type="Boolean" default="true" />
+    <aura:attribute name="listControllingValues" type="list" default="[]" description="to store controller field values"/>
+    <aura:attribute name="listDependingValues" type="list" default="['--- None ---']" description="to store dependent field values"/>
+    <aura:attribute name="depnedentFieldMap" type="map" description="map to store dependent values with controlling value"/>
+    <aura:attribute name="bDisabledDependentFld" type="boolean" default="true"/> 
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="newAccount" type="Account"
+                    default="{ 'sobjectType': 'Account',
+                             'FirstName': '',
+                             'LastName': '',
+                             'personEmail': '','BillingCountryCode': '','BillingStreet': '',
+                             'BillingCity': '',
+                             'BillingStateCode': '',
+                             'BillingPostalCode': '','phone': '',
+                             'BillingStreet': '',
+                             }"/>
+    
+    <div class="slds-page-header">
+        <div class="slds-align_absolute-center">
+            <div class="slds-text-heading_large">
+                <div class="slds-m-top_xx-large">
+                    Registration Page
+                </div>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div>
+        <lightning:layout >
+            <lightning:recordEditForm aura:id="recordEditFormSubmit" objectApiName="Account">
+                <lightning:layoutItem padding="around-small">
+                        <label>What type of product did you purchase?</label>
+                    <lightning:inputfield fieldName="Where_did_you_purchase__c" variant="label-hidden"/>
+                    <label>What is your age?</label>
+                    <lightning:inputfield fieldName="LastName" variant="label-hidden"/> 
+                </lightning:layoutItem>
+               
+                <lightning:layoutItem padding="around-small">
+                    <label>What is your gender?</label>
+                    <lightning:inputfield fieldName="Gender__c" variant="label-hidden"/>
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem padding="around-small">
+                    <label>How did you hear about this promotion?</label>
+                    <lightning:inputfield fieldName="Phone" variant="label-hidden"/> 
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small">
+                    <label>Why were you purchasing a new product selected </label>
+                    <lightning:inputfield fieldName="PersonBirthdate" variant="label-hidden"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small">
+                    <label>What made you purchase a Breville product?</label>
+                    <lightning:inputfield fieldName="PersonBirthdate" variant="label-hidden"/>
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small">
+                    <label>Did you make your purchase online or instore?</label>
+                    <lightning:inputfield fieldName="PersonBirthdate" variant="label-hidden"/>
+                </lightning:layoutItem>
+                
+                <lightning:button variant="brand" type="button" name="Submit" label="Submit" onclick="{!c.createRegistration}" />
+                <lightning:button variant="brand" type="button" name="Cancel" label="Cancel" onclick="{!c.Close}" />
+                
+            </lightning:recordEditForm>  
+        </lightning:layout>
+        
+    </div>
+</aura:component>

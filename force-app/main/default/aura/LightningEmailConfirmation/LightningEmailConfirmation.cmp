@@ -1,0 +1,47 @@
+<aura:component controller="LightningSelfRegisterController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="Email_Verification_Success" type="String"/>
+    <aura:attribute name="Logo_URL" type="String" default="https://breville-sfcommunity-dev.s3-us-west-2.amazonaws.com/SocialSignonImages/servlet.png"/>
+    <aura:attribute type="Boolean" name="showLoader" default="false"/>
+    <aura:attribute name="dynamicLogo" type="String" default=""/>
+    <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if> 
+    <div class="slds-grid" style="padding:100px;">
+        <div class="slds-col">
+            <div class="centerdiv">
+                <aura:if isTrue="{!v.dynamicLogo=='Breville'}">
+                    <div style="box-sizing: border-box;font-size: 14px;color: rgb(3, 3, 3);box-sizing: border-box;width: 250px !important;max-width: 45% !important;height: auto;vertical-align: middle;border: 0;text-align: left !important;font-family: CircularStd-Medium;font-size: 14px;color: rgb(3, 3, 3);line-height: 1.5;">
+                        <img src="{!$Resource.BrevilleLogo}"></img>
+                    </div>
+                    <div style="background-color: #624368; width: 24px; height: 4px; margin: 11px 0 24px" />
+                </aura:if>
+                <aura:if isTrue="{!v.dynamicLogo=='beanz'}">
+                    <img src="{!$Resource.Beanz}"></img>
+                </aura:if>
+                <aura:if isTrue="{!v.dynamicLogo=='app'}">
+                    <div style="box-sizing: border-box;font-size: 14px;color: rgb(3, 3, 3);box-sizing: border-box;width: 250px !important;max-width: 45% !important;height: auto;vertical-align: middle;border: 0;text-align: left !important;font-family: CircularStd-Medium;font-size: 14px;color: rgb(3, 3, 3);line-height: 1.5;">
+                        <img src="{!$Resource.BrevilleLogo}"></img>
+                    </div>
+                    <div style="background-color: #624368; width: 24px; height: 4px; margin: 11px 0 24px" />
+                </aura:if>
+                <aura:if isTrue="{!v.dynamicLogo=='sage'}">
+                    <div style="margin-top: 10px; box-sizing: border-box;font-size: 14px;color: rgb(3, 3, 3);box-sizing: border-box;width: 250px !important;max-width: 45% !important;height: auto;vertical-align: middle;border: 0;text-align: left !important;font-family: CircularStd-Medium;font-size: 14px;color: rgb(3, 3, 3);line-height: 1.5;">
+                        <img src="{!$Resource.SageLogo}" style="width:54%"></img>
+                    </div>
+                    <div style="background-color: #624368; width: 18px; height: 4px; margin: 4px 0 24px" />
+                </aura:if>                
+                <br/>  <br/> 
+                <div aura:id="headerh1">{!v.Email_Verification_Success}</div>
+            </div>
+        </div>
+    </div>    
+</aura:component>

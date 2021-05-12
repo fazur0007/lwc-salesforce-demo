@@ -1,0 +1,48 @@
+.THIS .slds-visual-picker__figure{
+    border-radius: 100px;
+    content: '';
+    /*position: absolute;*/
+    top: 0;
+    left: 0;
+    background-color: rgb(57, 21, 56);
+    z-index: 1;
+}
+.THIS .slds-visual-picker__figure:hover{
+    border-radius: 100px;
+    content: '';
+    /*position: absolute;*/
+    top: 0;
+    left: 0;
+    background-color: white;
+    z-index: 1;
+}
+.THIS .zoom {
+    transition: transform .2s;
+    margin: 0 auto;
+    background-color: #6ba235 !important; 
+}
+
+.THIS .zoom:hover {
+    -ms-transform: scale(1.5);
+    -webkit-transform: scale(1.5); 
+    transform: scale(1.5); 
+}
+.THIS .slds-text-title{
+    font-size: 1.25rem;
+    line-height: 0.75rem;
+    margin: 0;
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+    font-weight: bold;
+}
+.THIS .test-lvmForceActionsContainer{
+    display:none;
+}
+.THIS .customCls{
+    margin-top: -10px;
+    width: 50%;
+    position: absolute;
+    right: 17px;
+}
+.THIS .test-drillin{
+    display : none;
+}

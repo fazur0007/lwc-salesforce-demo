@@ -1,0 +1,5 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+<aura:handler name="eventonchild" event="c.TestComponentEventEvent" action="c.myAction"></aura:handler>    
+<c:TestComponentEventcmpChild></c:TestComponentEventcmpChild>
+    
+</aura:component>

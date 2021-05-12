@@ -1,0 +1,78 @@
+<template>
+    <lightning-card title="Pagination demo Accounts" icon-name="custom:custom63">
+        <div class="slds-var-m-around_medium">
+            <template if:true={visibleAccounts}>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col">
+                        <span></span>
+                    </div>
+                    <div class="slds-col">
+                        <span>
+                            <lightning-button label="Show Selected Contacts" onclick={showAccounts} style="margin-left: 40%" variant="brand"></lightning-button>
+                        </span>
+                    </div>
+                </div><br/>
+                
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="" scope="col">
+                                <div class="slds-truncate">
+                                    <lightning-input onchange={allSelected} type="checkbox"></lightning-input>
+                                </div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Name">Name</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="First Name">First Name</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Last Name">Last Name</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Phone">Phone</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Email">Email</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={visibleAccounts} for:item="account">
+                            <tr key={account.Id}>
+                                <th scope="col">
+                                    <div>
+                                        <lightning-input type="checkbox" value={account.Name} data-id={account.Id}></lightning-input>
+                                    </div>
+                                </th>
+                                <th scope="col">
+                                    <div>{account.Name}</div>
+                                </th>
+                                <th scope="col">
+                                    <div>{account.Name}</div>
+                                </th>
+                                <th scope="col">
+                                    <div>{account.Name}</div>
+                                </th>
+                                <th scope="col">
+                                    <div>
+                                        <lightning-formatted-phone value={account.Name}></lightning-formatted-phone>
+                                    </div>
+                                </th>
+                                <th scope="col">
+                                    <div>
+                                        <lightning-formatted-email value={account.Name}></lightning-formatted-email>
+                                    </div>
+                                </th>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+            <div slot="footer" class="slds-var-m-vertical_medium">
+                <c-pagination records={totalAccounts} record-size="6" onupdate={updateAccountHandler}></c-pagination>
+            </div>
+        </div>
+    </lightning-card>
+</template>

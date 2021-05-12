@@ -1,0 +1,89 @@
+<aura:component controller="LightningResetPasswordByAgent" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:attribute name="recordId" type="String" access="public"/>
+    <aura:attribute name="objectConfig" type="object" access="public"/>
+    <aura:attribute type="Boolean" name="showLoader" default="true"/>
+    <aura:attribute type="Boolean" name="showSucess" default="false"/>
+    <lightning:navigation aura:id="navLink"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" access="public"/>
+    <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if> 
+    <aura:html tag="style">
+        .slds-modal__container{ 
+        height: 70%;
+        width: 63%;
+        max-width: 377vh !important;
+        max-height: 300vh !important; 
+        } 
+        .modal-body{ 
+        height : 300vh !important; 
+        max-height: 1000vh !important; 
+        } 
+        .slds-modal__footer{ 
+        display: inline !important; 
+        }
+    </aura:html>
+    <br/><br/><br/>
+    <aura:if isTrue="{!v.showSucess}">
+        <div class="slds-page-header">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container">  
+                                <lightning:icon iconName="utility:email" alternativeText="Verify Link" title="Verify Link" />
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span class="slds-page-header__title slds-truncate">Verify Email Status</span>
+                                    </h1>
+                                </div>
+                            </div>
+                            <p class="slds-page-header__name-meta">{!v.objectConfig.Username}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><br/>
+        <p class="slds-page-header__name-meta">A new verification link for the following user has been sent via email</p>
+        <table class="slds-table slds-table_cell-buffer slds-no-row-hover slds-table_bordered">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th class="" scope="col">
+                        <div class="slds-truncate">Name</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate">Username</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate">Email</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="slds-hint-parent">
+                    <td>
+                        <div class="slds-truncate">{!v.objectConfig.Name}</div>
+                    </td>
+                    <td>
+                        <div class="slds-truncate">{!v.objectConfig.Username}</div>
+                    </td>
+                    <td>
+                        <div class="slds-truncate">{!v.objectConfig.Email}</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,13 @@
+.THIS .slds-required{
+    display:none !important;
+}
+.THIS .slds-form-element__label{
+    display:none !important;
+} 
+.THIS .slds-no-flex{
+    display:none !important;
+}
+.THIS .slds-spinner_container {
+    top: 12% !important;
+    bottom: 12% !important;
+}

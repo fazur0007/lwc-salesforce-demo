@@ -1,0 +1,12 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="showAccountAsset" type="Boolean" default="true" />
+    <aura:attribute name="selectedRecords" type="list"/> 
+    <aura:if isTrue="{!v.showAccountAsset}">
+        <c:applianceRegister showAccountAsset ="{!v.showAccountAsset}"/>
+     </aura:if>   
+    <aura:if isTrue="{!!v.showAccountAsset}">
+        <c:productregistrationLightning showAccountAsset ="{!v.showAccountAsset}"/>
+    </aura:if>
+ </aura:component>

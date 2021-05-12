@@ -1,0 +1,327 @@
+.THIS .centerdiv {
+    width: fit-content;
+    height: fit-content;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+.THIS.slds-spinner_container {  
+    z-index: 10000;
+    position: fixed;   
+}
+.THIS .slds-checkbox{
+    font-size: initial;
+}
+
+.THIS .sfdc_button_breville {
+    font-family: "Arial";
+    margin: 36px auto 33px auto;
+    display: block;
+    color: #ffffff;
+    background-color: #6ba235;
+    border-radius: 8px;
+    text-align: center;
+    padding: 10px 32px;
+    font-size: 22px;
+    font-weight: bold;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    width: 100%;
+}
+
+.THIS .sfdc_button_app {
+    font-family: "Jaffleglyph-Bold";
+    margin: 36px auto 33px auto;
+    display: block;
+    color: #ffffff;
+    background-color: #ff674d;
+    border-radius: 8px;
+    text-align: center;
+    padding: 10px 32px;
+    font-size: 22px;
+    font-weight: bold;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.THIS .sfdc_button_app:hover {
+    color: #ff674d;
+    background-color: #ffffff;
+}
+
+.THIS .sfdc_button_breville:hover{
+    color: #6ba235;
+    background-color: #ffffff;
+    border-color: #6ba235;
+}
+
+.THIS body {
+    color: #4f4f4f;
+    box-sizing: border-box;
+}
+
+.THIS .bodyClass_app {
+    font-family: "Jaffleglyph-Bold";
+    font-size: 18px;
+    font-weight: bold;
+    color: #5f5f5f;
+}
+
+
+.THIS .bodyClass_breville {
+    font-family: "Arial";
+    font-size: 18px;
+    font-weight: bold;
+    color: #5f5f5f;
+}
+.THIS .slds-form-element__label
+{
+    font-size: 18px  !important;
+    font-weight: bold !important;
+    color: black !important; 
+}
+.THIS input::-ms-reveal{
+    display: none;
+}
+.THIS input::-ms-clear {
+    display: none;
+}
+.THIS .LabelStyle_breville{
+    font-family: "Arial" !important;
+    font-size: 18px  !important;
+}
+
+.THIS .LabelStyle_app{
+    font-family: "Jaffleglyph-Bold"  !important;
+    font-size: 18px  !important;
+}
+
+.THIS .PasswordStreStyle_breville{
+    font-family: "Arial" !important;
+    color: #9c9c9c !important; 
+    font-size: 14px !important;
+}
+
+.THIS .PasswordStreStyle_app{
+    font-family: "Jaffleglyph-Bold" !important;
+    color: #9c9c9c !important; 
+    font-size: 14px !important;
+}
+
+.THIS .slds-input {
+    width: 100%;
+    padding: 11px 0px;
+    margin-bottom: 10px;
+    border: none;
+    border-bottom: 1px solid #cccccc;
+    border-radius: 0px;
+}
+
+.THIS .slds-input::placeholder {
+    color: #9c9c9c;
+    font-size: 18;
+    font-weight: normal;
+}
+
+.THIS #error {
+    text-align: center;
+    color: #ff0000;
+}
+
+.THIS .login-icon {
+    color: #ccc;
+    font-size: 22px;
+}
+
+.THIS .h1class_app {
+    font-size: 32px !important;
+    font-family: "Jaffleglyph-Bold" !important;
+    color: #3d3d3d !important;
+}
+
+.THIS .h1class_breville {
+    font-size: 24px !important;
+    font-family: "Arial" !important;
+    color: #3d3d3d !important;
+}
+
+.THIS p {
+    font-size: 18px;
+}
+
+.THIS .csRed_breville {
+    color:#391538 !important;
+    font-family: "Arial" !important;
+    font-size: 14px !important;
+    font-weight: initial !important;
+}
+
+.THIS .csRed_app {
+    color: #ff674d !important;
+    font-family: "Jaffleglyph-Bold" !important;
+    font-size: 18px !important;
+    font-weight: initial !important;
+}
+
+.THIS .LoginLink_breville {
+    font-family: "Arial" !important;
+    color: #391538 !important;
+}
+
+.THIS .LoginLink_app {
+    font-family: "Jaffleglyph-Bold" !important;
+}
+
+.THIS .communityForgotPassword_app{
+    font-size: 18px;
+    text-decoration: none;
+    font-weight: normal;
+    font-family: "Jaffleglyph-Bold";
+    color:#391538;
+    text-decoration: underline;
+}
+.THIS .communityForgotPassword_app:hover {
+    opacity: 0.8;
+}
+.THIS .communityForgotPassword_breville{
+    font-size: 14px;
+    text-decoration: none;
+    font-weight: normal;
+    color:#391538;
+    text-decoration: underline;
+}
+.THIS .communityForgotPassword_breville:hover {
+    opacity: 0.8;
+}
+
+.THIS .underline {
+    text-decoration: underline !important;
+}
+
+.THIS .underline:hover {
+    text-decoration: underline !important;
+}
+
+.THIS label.uiLabel-hidden {
+    display: none;
+}
+.THIS .slds-spinner_container {
+    z-index: 10000;
+    position: fixed;
+}
+/********************Beanz css starts here*******************/
+.THIS .divTandC_beanz{
+    line-height: 20px;
+    height: 18px;
+    font-family: Montserrat-Regular;
+    size: 18px;
+    letter-spacing: -0.47px;
+    color: #444444 !important;
+    font-size: 14px;
+    font-weight: normal !important;
+}
+.THIS .hyperLinkTC_beanz{
+    font-family: Montserrat-Regular !important;
+    font-size: 14px !important;
+    line-height: 20px !important;
+    letter-spacing: -0.47px !important;
+    color: #008391 !important;
+    text-decoration: underline;
+}
+.THIS .hyperLinkTC_beanz:hover {
+    font-family: Montserrat-Regular !important;
+    opacity: 0.8;
+}
+.THIS .communityForgotPassword_beanz{
+    font-size: 14px;
+    font-family: "Montserrat-Medium";
+    color: #008391;
+    letter-spacing: -0.47px;
+    line-height: 18px;
+    width: 260px;
+    height: 18px;
+    text-decoration: underline !important;
+}
+.THIS .communityForgotPassword_beanz:hover {
+    opacity: 0.8;
+    color: #008391;
+}
+.THIS .sfdc_button_beanz {
+    border-radius: 4px !important;
+    background: #008391 !important;
+    color: white !important;
+    font-family: "Montserrat-Bold";
+    margin: 36px auto 33px auto;
+    border-radius: 8px;
+    text-align: center;
+    padding: 10px 32px;
+    font-size: 22px;
+    width:100% !important;
+    height:49px !important;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+.THIS .sfdc_button_beanz:hover {
+    color: #008391 !important;
+    background: white !important;
+}
+.THIS .h2class_beanz {
+    font-family: Montserrat-Medium !important;
+    font-size: 15px !important;
+    line-height: 20px !important;
+    letter-spacing: -0.5px !important;
+    color: #5f5f5f !important;
+}
+.THIS .h1class_beanz {
+    width: 320px !important;
+    height: 28px !important;
+    font-size: 20px !important;
+    line-height: 28px !important;
+    letter-spacing: -0.5px !important;
+    color: #a25e41 !important;
+    font-family: Bitter-Bold !important;
+}
+.THIS .LabelStyle_beanz{
+    font-family: Montserrat-Medium !important;
+    font-size: 16px !important;
+    letter-spacing: -0.5px !important;
+    color: #8c8c8c !important;
+}
+.THIS .PasswordStreStyle_beanz{
+    color: #9c9c9c !important; 
+    font-size: 14px !important;
+    line-height: 18px !important;
+    height: 18px !important;
+    font-family: Montserrat-Regular !important;
+    size: 18px !important;
+    letter-spacing: -.47px !important;
+    font-size: 14px !important;
+    font-weight: normal !important;
+}
+.THIS .csRed_beanz{    
+    line-height: 18px;
+    height: 18px;
+    font-family: Montserrat-Regular;
+    size: 18px;
+    letter-spacing: -.47px;
+    color: #444444 !important;
+    font-size: 14px;
+    font-weight: normal !important;
+}
+.THIS .LoginLink_beanz {
+    font-size: 14px;
+    font-family: "Montserrat-Medium";
+    color: #008391;
+    letter-spacing: -0.47px;
+    line-height: 18px;
+    width: 260px;
+    height: 18px;
+}
+
+/********************Beanz css ends here*********************/

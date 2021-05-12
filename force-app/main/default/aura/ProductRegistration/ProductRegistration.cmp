@@ -1,0 +1,692 @@
+<aura:component controller="ProductRegistrationLightningController" implements="flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId" access="global" >
+    <!-- attribute for tooltip for PDC and DOB -->
+    <aura:attribute name="tooltipForPDC" type="boolean" default="false" />
+    <aura:attribute name="tooltipForDOB" type="boolean" default="false" />
+    <!-- attribute for pickList selected value  -->
+    <aura:attribute name="selectedValueForProduct" type="String" default=""/>
+    <aura:attribute name="selectedValueForModel" type="String" default=""/>
+    <aura:attribute name="selectedValueForGift" type="String" default=""/>
+    <!-- attribute for Products and Models -->
+    <aura:attribute name="productsList" type="Product2[]"/>
+    <aura:attribute name="models" type="Product2[]"/>
+    <aura:attribute name="placeOfPurchaseList" type="List" default="[]"   />
+    <!-- attribute for toggle the components -->
+    <aura:attribute name="flag" type="boolean" default="true"/>
+    <!-- 'showLoadingSpinner' attribute for show/hide the uploading image and msg in aura:if-->
+    <aura:attribute name="showLoadingSpinner" type="boolean" default="false" />
+    <!-- 'fileName' attribute for display the selected file name -->  
+    <aura:attribute name="fileName" type="String"   />
+    <aura:attribute name="firstName" type="String" default = "" access="public"/>
+    <aura:attribute name="lastName" type="String"  default = "" access="public"/>
+    <aura:attribute name="showAccountAsset" type="Boolean" default="true" />  
+    <aura:attribute name="saveInAsset" type="Asset"  default="{
+                                                              'sobjectType' : 'Asset',
+                                                              'Warranty_Product_Sub_Category__c': '',
+                                                              'Product2Id': '',
+                                                              'Where_did_you_purchase__c': '',
+                                                              'PurchaseDate': '',
+                                                              'attachment': '',
+                                                              'Batch_Code__c': '',
+                                                              'SerialNumber' : ''
+                                                              
+                                                              }"/>
+    <aura:attribute name="newAccount" type="Account"  default="{ 
+                                                               'sobjectType': 'Account',
+                                                               'FirstName': '',
+                                                               'LastName': '',
+                                                               'PersonBirthdate':''
+                                                               }"/>
+    <aura:attribute name="isProductDetails" type="boolean" default="true"/>
+    <aura:attribute name="isDeliveryDetails" type="boolean" default="false"/>
+    <aura:attribute name="isSummaryRegistration" type="boolean" default="false"/>
+    <aura:attribute name="isThankYou" type="boolean" default="false"/>
+    <aura:attribute name="saveInAccount" type="Account"/>
+    <aura:attribute name="fieldMap" type="Map"/>
+    <aura:attribute name="statefieldMap" type="Map"/>
+    <aura:attribute name="listControllingValues" type="list" default="[]" description="to store controller field values"/>
+    <aura:attribute name="listDependingValues" type="list" default="['--- None ---']" description="to store dependent field values"/>
+    <aura:attribute name="depnedentFieldMap" type="map" description="map to store dependent values with controlling value"/>
+    <aura:attribute name="bDisabledDependentFld" type="boolean" default="true"/> 
+    <aura:attribute name="street" type="String" default=""/>
+    <aura:attribute name="city" type="String" default=""/>
+    <aura:attribute name="province" type="String" default="CA"/>
+    <aura:attribute name="country" type="String" default="US"/>
+    <aura:attribute name="postalCode" type="String" default=""/>
+    <aura:attribute name="provinceOptions" type="List" default="[]"/>
+    <aura:attribute name="countryOptions" type="List" default="[]"/>
+    <aura:attribute name="previousCountry" type="String"/>
+    <aura:attribute name="isActive" type="Boolean" default="false" required="true" />
+    <aura:attribute name="ProductFlag" type="boolean" default="true"/>
+    <aura:attribute name="accountId" type="String" />
+    <aura:attribute name="assetId" type="String" />
+    <aura:attribute name="accountRecord" type="Account" />
+    <aura:attribute name="assetRecord" type="Asset" />
+    <aura:attribute name="receiptURL" type="String" />
+    <aura:attribute name="receiptName" type="String" />
+    <aura:attribute name="modelName" type="String" />
+    <aura:attribute name="productName" type="String" />
+    <aura:attribute name="isLoad" type="Boolean" default="false" />
+    
+    <aura:attribute name="objDetail" type="Case" default="{'sobjectType' : 'Case'}"/>
+    <aura:attribute name="controllingFieldAPI" type="string" default="Country__c" description="store field API name of Controller field"/>
+    <aura:attribute name="dependingFieldAPI" type="string" default="Purchased_From__c" description="store field API name of dependent field"/>
+    
+    <aura:attribute name="Recid" type="string"/>
+    
+    <aura:attribute name="intLastStep" type="Integer" default="4" />
+    <aura:attribute name="intCurrentStep" type="Integer" default="2" />
+    <aura:attribute name="recaptchaResponse" type="String" />
+    <aura:attribute name="filetype" type="List" default="['.png', '.jpg', '.jpeg']" />
+    
+    <!-- init handler -->
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    <aura:handler name="render" value="{!this}" action="{!c.onRender}" />
+    <!--  ProductDetails Component Starts here -->
+    <!-- TODO don't hardcode labels for multiple languages -->
+    <lightning:card>
+        <div  style="box-sizing: border-box;font-size: 14px;color: rgb(3, 3, 3);box-sizing: border-box;width: 155.7px !important;max-width: 45% !important;height: 36px;vertical-align: middle;border: 0;text-align: left !important;font-family: CircularStd-Medium;font-size: 14px;color: rgb(3, 3, 3);line-height: 1.5;">
+            <img src="{!$Resource.BrevilleLogo}"></img>
+        </div>
+        <br />
+        <div class="Register-your-product slds_responsive">{!$Label.c.Register_your_product}</div>
+        <div  class="slds_responsive">
+            <div class="circle-parent slds_responsive">
+                <span class="circle cicrle-top-padding" aura:id="circle1">
+                    <aura:if isTrue="{!lessthanorequal(v.intCurrentStep, 1)}">
+                        <div class="cicrle-top-padding-step slds-align_absolute-center">1</div>
+                        <aura:set attribute="else">
+                            <div class="cicrle-top-padding-step">1</div>
+                        </aura:set>
+                    </aura:if>
+                </span>
+                <span class="stepLabel" aura:id="label1">Account</span>
+            </div>
+            <span class="line" aura:id="line1"></span> 
+            <div class="circle-parent">
+                <span class="circle inactiveStep" aura:id="circle2">
+                    <aura:if isTrue="{!lessthanorequal(v.intCurrentStep, 2)}">
+                        <div class="cicrle-top-padding-step slds-align_absolute-center">2</div>
+                        <aura:set attribute="else">
+                            <div class="cicrle-top-padding-step">2</div>
+                        </aura:set>
+                    </aura:if>
+                </span>
+                <span class="stepLabel" aura:id="label2">{!$Label.c.Your_Purchase}</span>
+            </div>
+            <span class="line" aura:id="line2"></span>
+            <div class="circle-parent">
+                <span class="circle inactiveStep" aura:id="circle3">
+                    <aura:if isTrue="{!lessthanorequal(v.intCurrentStep, 3)}">
+                        <div class="cicrle-top-padding-step slds-align_absolute-center">3</div>
+                        <aura:set attribute="else">
+                            <div class="cicrle-top-padding-step">3</div>
+                        </aura:set>
+                    </aura:if>
+                </span>
+                <span class="stepLabel" aura:id="label3">{!$Label.c.Your_Delivery}</span>
+            </div>
+            <span class="line" aura:id="line3"></span>
+            <div class="circle-parent">
+                <span class="circle inactiveStep" aura:id="circle4">
+                    <aura:if isTrue="{!lessthanorequal(v.intCurrentStep, 4)}">
+                        <div class="cicrle-top-padding-step slds-align_absolute-center">4</div>
+                        <aura:set attribute="else">
+                            <div class="cicrle-top-padding-step">4</div>
+                        </aura:set>
+                    </aura:if>
+                </span>
+                <span class="stepLabel" aura:id="label4">{!$Label.c.Review}</span>
+            </div>
+        </div>
+        <!-- <div class="slds-p-around_xx-large">
+            <br/>
+            <aura:if isTrue="{!v.intCurrentStep == 1}"> 
+                <lightning:button label="Cancel" title="Neutral action" onclick="{! c.handleClick }"/>
+            </aura:if>
+            <aura:if isTrue="{!v.intCurrentStep != 1}">
+                <lightning:button label="Back" title="Neutral action" onclick="{! c.handleBack }"/>
+            </aura:if>
+            <aura:if isTrue="{!v.intCurrentStep != v.intLastStep}">
+                <lightning:button variant="brand" label="Next" title="Brand action" onclick="{! c.handleNext }" />
+            </aura:if>
+            <aura:if isTrue="{!v.intCurrentStep == v.intLastStep}">
+                <lightning:button variant="brand" label="Submit" title="Brand action" onclick="{! c.handleClick }" />
+            </aura:if>
+        </div>-->
+        <br/>
+        <aura:if isTrue = "{!v.isProductDetails}">
+            <div class="PageHeader slds_responsive ">{!$Label.c.Your_Purchase}</div>
+            <br></br>
+            <div class="slds-float_left slds_responsive " >
+                <!-- Calling productDetails Component   -->
+                
+                <!--    <div class="slds-box slds-align_absolute-left slds-box_xx-small slds-text-align_left " labels="{!$Label.c.Register_your_product}" > -->
+                <!--  <div class="slds-p-around_large  slds-text-align_left"> -->     
+                <!-- layoutItem for  -->
+                <div class="HomeText sfdc_input_box_div  ">{!$Label.c.Your_Purchase_Welcome_Text}</div>
+                <br/>
+                <div class="HomeText sfdc_input_box_div  ">{!$Label.c.Mandatory_text}</div>
+                <br/>
+                <div class="slds-grid  slds-gutters sfdc_input_box_div sfdc_right_margin">
+                    <div class="slds-col slds-size_2-of-4 ">
+                        
+                        <lightning:input class="noAsterisk font_family" 
+                                         aura:id="formFieldToValidate" 
+                                         label="First name *"
+                                         placeholder="First Name" 
+                                         value="{!v.newAccount.FirstName}"
+                                         messageWhenValueMissing="First Name is Mandatory" 
+                                         required="true"/> 
+                        
+                    </div> 
+                    <div class="slds-col slds-size_2-of-4">
+                        <lightning:input class="noAsterisk font_family" 
+                                         label="Last name *"
+                                         aura:id="formFieldToValidate" 
+                                         placeholder="Last Name" 
+                                         value="{!v.newAccount.LastName}"
+                                         messageWhenValueMissing="Last Name is Mandatory" 
+                                         required="true"
+                                         /> 
+                    </div> 
+                </div> 
+                
+                <div class="slds-grid slds-gutters sfdc_tool_tip_top sfdc_input_box_div sfdc_right_margin">
+                    <div class="slds-col slds-size_3-of-4 sfdc_tool_tip_top_inner_div sfdc_right_margin">
+                        <label class="slds-form-element__label font_family" for="PersonBirthdate">
+                            <!--Custom {!$Label.c.Birth_DateV2} --> 
+                            <abbr class="slds-required" > </abbr>Date of birth * </label>
+                    </div>
+                    <div class="slds-col slds-size_1-of-4   sfdc_tool_tip_top_icon">
+                        <span>
+                            <lightning:helptext content="{!v.saveInAccount.PersonBirthdate}" />
+                            <!--Custom rendered element -->
+                            <a href=""  onmouseover="{!c.showToolTipForDOB}" onmouseout="{!c.HideToolTipForDOB}">{!$Label.c.What_is_this}</a>
+                            
+                            
+                            <aura:if isTrue="{!v.tooltipForDOB}" >   
+                                <div  class="content_img" id="help" style="sfdc_tool_tip_left tooltipForPDC">
+                                    <img src="{!$Resource.BatchCodeImage}" />
+                                </div>
+                            </aura:if>
+                        </span>
+                    </div> 
+                </div> 
+                <div class="sfdc_tool_tip_bottom ">  
+                    <span>
+                        <lightning:input type="date" 
+                                         class="noAsterisk sfdc_input_box_div font_family sfdc_right_margin"
+                                         aura:id="formFieldToValidate" 
+                                         placeholder="dd/mm/yyyy"
+                                         name="DateOfPurchase" 
+                                         value="{!v.newAccount.PersonBirthdate}"
+                                         messageWhenValueMissing="DOB is Mandatory" 
+                                         required="true"
+                                         />
+                    </span>
+                </div>  
+                
+                <br></br>
+                <!-- *********Product Details Starts***************** -->
+                <lightning:select class="slds-m-left_none sfdc_input_box_div font_family sfdc_right_margin noAsterisk" aura:id="formFieldToValidate" onchange="{!c.handleOptionSelectedForProduct}" label="What type of product did you purchase? *" value="{!v.saveInAsset.Warranty_Product_Sub_Category__c}" messageWhenValueMissing="Date of purchase is Mandatory" 
+                                  required="true">
+                    
+                    <option >{!$Label.c.Default_Picklist_Value}</option>
+                    <aura:iteration items="{!v.productsList}" var="item">
+                        
+                        <option value="{!item.Id}">{!item.value}</option>
+                    </aura:iteration>
+                </lightning:select>
+                
+                <br></br>
+                <lightning:select class="slds-m-left_none sfdc_input_box_div font_family sfdc_right_margin" aura:id="mySelected"  onchange="{!c.handleOptionSelectedForM}" label="What model did you purchase?" value="{!v.saveInAsset.Product2Id}">
+                    
+                    <option >{!$Label.c.Default_Picklist_Value}</option>
+                    <aura:iteration items="{!v.models}" var="model">
+                        <option value="{!model.value}" >{!model.label}</option>
+                        <!--     <option value="{!model.value}" >{!model.label}</option>
+                    <option value="{!model.Id}" >{!model.label}</option>
+                    <option value="{!model.Id}" >{!model.value}</option> -->
+                    </aura:iteration>
+                </lightning:select>
+                <br></br>
+                <!-- *********Product Details Ends****************** -->
+                <lightning:select class="slds-m-left_none sfdc_input_box_div font_family sfdc_right_margin" aura:id="placeOfPurchaseId"  onchange="{!c.placeOfPurchase}" label="Place of purchase" value="{!v.saveInAsset.Where_did_you_purchase__c}" >
+                    
+                    <option >{!$Label.c.Default_Picklist_Value}</option>
+                    
+                    <aura:iteration items="{!v.placeOfPurchaseList}" var="Items">
+                        <option value="{!Items.Id}">{!Items}</option>
+                    </aura:iteration>
+                    
+                </lightning:select>
+                
+                <br></br>
+                <lightning:input type="date"
+                                 class="noAsterisk sfdc_input_box_div font_family sfdc_right_margin"
+                                 aura:id="formFieldToValidate"
+                                 placeholder="{!$Label.c.Date_of_Purchase_Placeholder}"
+                                 name="DateOfPurchase" label="Date of purchase *" 
+                                 value="{!v.saveInAsset.PurchaseDate}"
+                                 messageWhenValueMissing="Date of purchase is Mandatory" 
+                                 required="true"/>
+                
+                <br></br>
+                <!-- *********Input Fields End****************** -->
+                
+                <!-- *********Upload files Starts*********{!$Label.c.Upload_Receipt_To_Redeem_Offer}********* -->
+                <div class=" sfdc_input_box_div">
+                    <lightning:input class=" noAsterisk sfdc_right_margin font_family" aura:id="formFieldToValidate" messageWhenValueMissing="Receipt is Mandatory" required="true" onchange="{!c.handleFilesChangeForUploadingFile}" value="{!v.saveInAsset.attachment}" type="file" name="uploadedFile" label="Upload image of receipt(JPEG,PNG,GIF,PDF) maximum file
+                                                                                                                                                                                                                                                                                                                 size 6MB. Receipt must be attached to be receive promotional offer *" multiple="false"/>
+                    <div class="slds-text-body_small slds-text-color_error slds-m-left_none uploadedFile">{!v.saveInAsset.attachment} </div>
+                    
+                    <!--use aura:if for show-hide the loading spinner image--> 
+                    <aura:if isTrue="{!v.showLoadingSpinner}">
+                        <div class="slds-text-body_small slds-text-color_error slds-m-left_none">{!$Label.c.processing}
+                            <img src="/auraFW/resources/aura/images/spinner.gif" class="spinner-img" alt="Loading"/>'
+                        </div>
+                        
+                    </aura:if>
+                </div>
+                <!--*********Upload files End*************-->
+                <br></br>
+                
+                <div class="slds-grid slds-gutters sfdc_tool_tip_top sfdc_input_box_div">
+                    
+                    <div class="slds-col slds-size_3-of-4 sfdc_tool_tip_top_inner_div ">
+                        <label class="slds-form-element__label font_family" for="Batch_Code__c">
+                            <abbr class="slds-required font_family" > </abbr>{!$Label.c.Product_Batch_Code_V2} </label>
+                    </div>
+                    <div class="slds-col slds-size_1-of-4  sfdc_tool_tip_top_icon">
+                        <span>
+                            <lightning:helptext content="{!v.saveInAsset.Batch_Code__c}" />
+                            <!--Custom rendered element-->
+                            <a href="" aria-describedby="help" onmouseover="{!c.showToolTipForPDC}" onmouseout="{!c.HideToolTipForPDC}">{!$Label.c.What_is_this}</a>
+                            <aura:if isTrue="{!v.tooltipForPDC}" >   
+                                <div  role="tooltip" id="help" style="sfdc_tool_tip_left tooltipForPDC">
+                                    
+                                    <img src="{!$Resource.BatchCodeImage}" />
+                                </div>
+                            </aura:if>
+                        </span> 
+                    </div> 
+                </div> 
+                <div class="sfdc_tool_tip_bottom"> 
+                    <span>
+                        <lightning:input class="sfdc_input_box_div font_family sfdc_right_margin" 
+                                         aura:id="pdcId" 
+                                         type="text"
+                                         placeholder="e.g. 1234" 
+                                         name="PDC"
+                                         value="{!v.saveInAsset.Batch_Code__c}"
+                                         /> 
+                    </span>
+                </div>  
+                
+                <br></br>
+                <lightning:input class=" sfdc_input_box_div font_family sfdc_right_margin" aura:id="serialNumberId" label="Serial number"
+                                 name="Serial Number"
+                                 placeholder="123456789"
+                                 value="{!v.saveInAsset.SerialNumber}"
+                                 required="false"/>
+                <br></br>
+                <!-- *********Select Gift Starts****************** -->
+                
+                <lightning:select class="slds-m-left_none sfdc_input_box_div font_family sfdc_right_margin noAsterisk" aura:id="chooseYourGift" onchange="{!c.chooseYourGift}" label="Choose your gift" value="{!v.selectedValueForGift}" messageWhenValueMissing="Date of purchase is Mandatory">
+                    <option >{!$Label.c.Default_Picklist_Value}</option>
+                    <option value="select">GiftTest1</option>
+                    <option value="select">GiftTest2</option>
+                    <option value="select">GiftTest3</option>
+                    <option value="select">GiftTest4</option>
+                    
+                </lightning:select>
+                
+                
+                
+                <!-- *********Select Gift End****************** -->
+                <!-- <div class="slds-grid slds-gutters ">
+                <div class="slds-col slds-size_3-of-4 ">
+                </div>
+                <div class="slds-col slds-size_1-of-4 ">
+                    <lightning:button class="sfdc_button_breville sfdc_next_button_root_div_left sfdc_input_box_div" label="Next"  onclick="{!c.goOnApplianceRegisterSummary}"/>
+                </div>
+            </div> -->
+                <lightning:button class="sfdc_button_breville  slds-float_right sfdc_next_button_root_div_left" label="Next"  onclick="{!c.goOnApplianceRegisterSummary}"/>
+                
+            </div>
+        </aura:if> 
+        <aura:if isTrue = "{!v.isDeliveryDetails}">
+            <div class="slds_responsive" style = "width:90%">
+                <div class="PageHeader">{!$Label.c.Your_Delivery}</div>
+                <div >
+                    <!-- DeliveryDetail Component  -->
+                    <br/>
+                    <div class="HomeText sfdc_input_box_div">{!$Label.c.Provide_Delivery_Details}</div>
+                    <br/>
+                    <div class="HomeText sfdc_input_box_div">{!$Label.c.Mandatory_text}</div>
+                    <br/>
+                    
+                    <!--     <div class="slds-p-around_large  slds-text-align_left"> -->
+                    <!--   <div class="slds-box slds-align_absolute-left slds-box_xx-small slds-text-align_left "> -->
+                    
+                    <lightning:recordEditForm aura:id="recordEditFormSubmit"  objectApiName="Account" recordId="{!v.Recid}" >
+                        
+                        <div class="slds-grid  slds-gutters sfdc_input_box_div sfdc_right_margin">
+                            <div class="slds-col slds-size_2-of-4 ">
+                                <lightning:input class="sfdc_input_box_div" aura:id="firstName" label="{!$Label.c.First_Name}" value="{!v.newAccount.FirstName}" readonly ="true"/>
+                            </div>
+                            <div class="slds-col slds-size_2-of-4">
+                                <lightning:input class="sfdc_input_box_div" aura:id="lastName" label="{!$Label.c.Last_Name}" value="{!v.newAccount.LastName}" readonly ="true"/>
+                            </div> 
+                        </div> 
+                        
+                        
+                        <!--   <lightning:inputfield class="sfdc_input_box_div" fieldName="Phone" label="{!$Label.c.PhoneV2}" variant="label-hidden"  value="{!v.newAccount.Phone}"/> -->
+                        
+                        <div class="slds-form-element sfdc_input_box_div">
+                            <label class="slds-form-element__label" for="text-input-id-1">{!$Label.c.PhoneV2}<span>*</span></label>
+                            <div class="slds-form-element__control">
+                                <lightning:inputfield class="sfdc_input_box_div" aura:id="fieldId" fieldName="Phone" variant="label-hidden"  value="{!v.newAccount.Phone}"/> 
+                                
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element sfdc_input_box_div">
+                            <label class="slds-form-element__label" for="text-input-id-1">Address Line1<span>*</span></label>
+                            <div class="slds-form-element__control">
+                                <lightning:inputfield class="sfdc_input_box_div" aura:id="fieldId" fieldName="BillingStreet" variant="label-hidden"  value="{!v.newAccount.BillingStreet}" requird="true"/> 
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="slds-form-element sfdc_input_box_div">
+                            <label class="slds-form-element__label" for="text-input-id-1">Address Line2(Optional)</label>
+                            <div class="slds-form-element__control">
+                                <lightning:inputfield class="sfdc_input_box_div" fieldName="Billing_Street_Line_1__c" variant="label-hidden"  value="{!v.newAccount.Billing_Street_Line_1__c}"/> 
+                            </div>
+                        </div>
+                        
+                        
+                        
+                        
+                        <div class="slds-form-element sfdc_input_box_div">
+                            <label class="slds-form-element__label" for="text-input-id-1">Country<span>*</span></label>
+                            <div class="slds-m-left_none">
+                                <lightning:inputfield class="sfdc_input_box_div" aura:id="fieldId" fieldName="BillingCountryCode"  variant="label-hidden" value="{!v.newAccount.BillingCountry}"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element sfdc_input_box_div">
+                            <label class="slds-form-element__label" for="text-input-id-1">Province/State<span>*</span></label>
+                            <div class="slds-m-left_none">
+                                <lightning:inputfield class="sfdc_input_box_div" aura:id="fieldId" fieldName="BillingStateCode"   variant="label-hidden" value="{!v.newAccount.BillingState}"/>    
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form-element sfdc_input_box_div">
+                            <label class="slds-form-element__label" for="text-input-id-1">City<span>*</span></label>
+                            <div class="slds-form-element__control">
+                                <lightning:inputfield class="sfdc_input_box_div" aura:id="fieldId" fieldName="BillingCity"  variant="label-hidden" value="{!v.newAccount.BillingCity}"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element sfdc_input_box_div">
+                            <label class="slds-form-element__label" for="text-input-id-1">PostalCode<span>*</span></label>
+                            <div class="slds-form-element__control">
+                                <lightning:inputfield class="sfdc_input_box_div" aura:id="fieldId" fieldName="BillingPostalCode"   variant="label-hidden" value="{!v.newAccount.BillingPostalCode}"/>    
+                            </div>
+                        </div>
+                        
+                    </lightning:recordEditForm>   
+                    <div class="slds-form-element sfdc_input_box_div">
+                        
+                        <div id="recaptchaCheckbox"></div>
+                        <br/>
+                        
+                        
+                    </div>
+                    <div class="slds-grid" style = "width:90%">
+                        <div class="slds-col slds-size_1-of-4 ">                   
+                            <lightning:button class="sfdc_button_breville sfdc_back_button_root_div_left float_left"
+                                              label="Back"
+                                              onclick="{! c.handleBackButton }"/>
+                        </div>
+                        <div class="slds-col slds-size_2-of-4 ">
+                        </div>
+                        
+                        <div class="slds-col slds-size_1-of-4 ">
+                            <lightning:button aura:id="myButton" class="sfdc_button_breville sfdc_next_button_root_div_left" label="Next" onclick="{!c.goRegistrationSummery}" disabled="true" />
+                            
+                        </div>
+                    </div>
+                    
+                    
+                </div>   
+            </div>
+            
+        </aura:if>  
+        <aura:if isTrue = "{!v.isSummaryRegistration}">
+            <div class="PageHeader">{!$Label.c.Review}</div>
+            
+            <div class="slds-p-around_xx-large slds-align_absolute-center slds-text-align_left">
+                <div class="slds-form" style="margin-right: auto;margin-left: 5rem;">
+                    <div>
+                        <lightning:layout >
+                            <lightning:layoutItem  size ="6"> 
+                                <h2 class="slds-p-top_large">Your Purchase</h2>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem  size ="3">
+                                <span></span>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem  size ="3">
+                                <a onclick = "{!c.purchaseEdit}" class="slds-box_xx-small" >Edit</a>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </div>
+                    <div>
+                        <lightning:layout>
+                            <lightning:layoutItem>
+                                <div >
+                                    <label class="slds-form-element__label" >Product:</label>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="slds-p-around_x-small" >
+                                <div >
+                                    <ui:outputText value="{!v.saveInAsset.Warranty_Product_Sub_Category__c}" class="font_family" />
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout>
+                            <lightning:layoutItem >
+                                <div >
+                                    <label class="slds-form-element__label" >Model:</label>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="slds-p-around_x-small" >
+                                <div >
+                                    <ui:outputText value="{!v.saveInAsset.Product2Id}" class="font_family" />
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout>
+                            <lightning:layoutItem >
+                                <div >
+                                    <label class="slds-form-element__label" >Serail Number:</label>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="slds-p-around_x-small" >
+                                <div >
+                                    <ui:outputText value="{!v.saveInAsset.SerialNumber}" class="font_family" />
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout>
+                            <lightning:layoutItem >
+                                <div >
+                                    <label class="slds-form-element__label" >Date of Purchase:</label>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="slds-p-around_x-small">
+                                <div >
+                                    <ui:outputText value="{!v.saveInAsset.PurchaseDate}" class="font_family" />
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout>
+                            <lightning:layoutItem >
+                                <div >
+                                    <label class="slds-form-element__label" >Receipt:</label>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem  class="slds-p-around_x-small">
+                                <div class="custom-box">
+                                    <a href="{!v.saveInAsset.attachment}">{!v.saveInAsset.attachment}</a>
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-p-around_xx-large slds-align_absolute-center slds-text-align_left">
+                <div class="slds-form" style="margin-right: auto;margin-left: 5rem;">
+                    <div >
+                        <lightning:layout >
+                            <lightning:layoutItem  size ="6"> 
+                                <h2 class="slds-p-top_large font_family">Your Delivery</h2>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem  size ="3">
+                                <span></span>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem  size ="3">
+                                <a onclick = "{!c.deliveryEdit}" class="slds-box_xx-small" >Edit</a>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </div>
+                    <div>
+                        <lightning:layout>
+                            <lightning:layoutItem >
+                                <div >
+                                    <label class="slds-form-element__label font_family" >Name:</label>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem  class="slds-p-around_x-small">
+                                <div >
+                                    <ui:outputText value="{!v.newAccount.FirstName}" class="font_family" />
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout>
+                            <lightning:layoutItem >
+                                <div >
+                                    <label class="slds-form-element__label font_family" >Phone:</label>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem  class="slds-p-around_x-small">
+                                <div >
+                                    <ui:outputText value="{!v.newAccount.Phone}" class="font_family" />
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout>
+                            <lightning:layoutItem >
+                                <div >
+                                    <label class="slds-form-element__label font_family" >Address line 1:</label>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem  class="slds-p-around_x-small">
+                                <div >
+                                    <ui:outputText value="{!v.newAccount.BillingStreet}"  class="font_family"/>
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout>
+                            <lightning:layoutItem >
+                                <div >
+                                    <label class="slds-form-element__label font_family" >Address line 2:</label>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="slds-p-around_x-small">
+                                <div >
+                                    <ui:outputText value="{!v.newAccount.Billing_Street_Line_1__c}" class="font_family" />
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout>
+                            <lightning:layoutItem >
+                                <div >
+                                    <label class="slds-form-element__label font_family" >City:</label>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="slds-p-around_x-small" >
+                                <div >
+                                    <ui:outputText value="{!v.newAccount.BillingCity}" class="font_family" />
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout>
+                            <lightning:layoutItem >
+                                <div >
+                                    <label class="slds-form-element__label font_family" >State:</label>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="slds-p-around_x-small" >
+                                <div >
+                                    <ui:outputText value="{!v.newAccount.BillingState}" class="font_family" />
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout>
+                            <lightning:layoutItem >
+                                <div >
+                                    <label class="slds-form-element__label font_family" >PostalCode:</label>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="slds-p-around_x-small" >
+                                <div >
+                                    <ui:outputText value="{!v.newAccount.BillingPostalCode}" class="font_family" />
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout>
+                            <lightning:layoutItem >
+                                <div >
+                                    <label class="slds-form-element__label font_family" >Country:</label>
+                                </div>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="slds-p-around_x-small" >
+                                <div >
+                                    <ui:outputText value="{!v.newAccount.BillingCountry}" class="font_family" />
+                                </div>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-grid slds-gutters ">
+                <div class="slds-col slds-size_1-of-4 ">                   
+                    <lightning:button label="Back"  class="sfdc_button_breville" onclick = "{!c.back}" />
+                </div>
+                <div class="slds-col slds-size_1-of-4 ">
+                </div>
+                <div class="slds-col slds-size_2-of-4 ">
+                    <lightning:button label="Submit Registration" class="sfdc_big_button_breville" onclick = "{!c.submitClaimJs}"/>
+                </div>
+            </div>
+            
+        </aura:if> 
+        <aura:if isTrue = "{!v.isThankYou}"> 
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Thank You</h2> 
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    
+                    <p>Thank you for submitting your claim</p>
+                    <p>A confirmation email has been sent to 'Email Address'. Your claim number is Claim Id and its status is .</p>
+                    <p>To view your claim status, simple navigate to My Orders within yoor My Breville account.</p>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_brand">Back to Breville home</button>
+                </footer>
+            </div>
+        </aura:if>
+    </lightning:card>
+</aura:component>

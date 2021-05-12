@@ -1,0 +1,26 @@
+.THIS .buttonclass{
+    margin: 19px !important;
+    padding-bottom: 0px !important;
+    position: sticky;
+}
+.THIS .slds-form-element__label{
+    font-weight: bold !important;
+}
+.THIS .knwClass{
+    font-family: 'Roboto', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.42857;
+    color: #ff5f00 !important;
+    font-weight: bold !important;
+}
+.THIS .slds-text-title_caps{
+    color:black; 
+    background:#f2f2f2;
+}
+.THIS .pdfFrame {
+	width: 100%;
+}
+.THIS .truncate{
+	font-weight: bold !important;
+}

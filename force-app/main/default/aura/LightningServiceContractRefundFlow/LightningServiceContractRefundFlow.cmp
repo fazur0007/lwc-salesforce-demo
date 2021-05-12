@@ -1,0 +1,129 @@
+<aura:component controller="LightningServiceContractRefundFlow_Cls" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:isUrlAddressable,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" 
+                access="global">
+    <aura:attribute name="recordId" type="String" />
+    <lightning:navigation aura:id="navLink"/> 
+    <aura:attribute name="selectedRecord" type="String" />
+    <aura:attribute type="Boolean" name="showLoader" default="true"/>
+    <aura:attribute type="Boolean" name="showWarning" default="false"/>
+    <aura:attribute name="data" type="Object"/> 
+    <aura:handler name="init" value="{!this}" action="{!c.getAssets}"/>
+    <aura:html tag="style">
+        .slds-modal__container{ 
+            height: 60%;
+            width: 73%;
+            max-width: 377vh !important;
+            max-height: 300vh !important; 
+        } 
+        .modal-body{ 
+            height : 200vh !important; 
+            max-height: 800vh !important; 
+        } 
+        .slds-modal__footer{ 
+            display: inline !important; 
+        }
+    </aura:html>
+    <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <div class="slds-m-around_xx-large">
+        <header class="slds-modal__header">
+            <h2 class="slds-text-heading_medium"><b>Refund Flow</b></h2>
+        </header>
+        <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal slds-p-horizontal_small" role="grid">
+            <thead>
+                <tr class="slds-text-title_caps" style="height: 37px;">
+                    <th class="slds-cell-shrink" scope="col"> 
+                        <div class="slds-truncate" title="Action">Action</div>
+                    </th>
+                    <th class="slds-cell-shrink" scope="col">
+                        <div class="slds-truncate" title="Assetname">Asset Name</div>
+                    </th>
+                    <th class="slds-cell-shrink" scope="col">
+                        <div class="slds-truncate" title="Order">Order</div>
+                    </th>
+                    <th class="slds-cell-shrink" scope="col">
+                        <div class="slds-truncate" title="product">Product</div>
+                    </th>
+                    <th class="slds-cell-shrink" scope="col">
+                        <div class="slds-truncate" title="Extended warranty">Extended Warranty</div>
+                    </th>
+                    <th class="slds-cell-shrink" scope="col">
+                        <div class="slds-truncate" title="Return only Extended Warranty">Return only Extended Warranty</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:if isTrue="{!not(empty(v.data))}">
+                    <aura:iteration items="{!v.data}" var="row">
+                        
+                        <tr class="slds-hint-parent">
+                            <td data-label="" scope="row">
+                                <lightning:input type="radio" value="{!row.Id}"  name="groupedAsOne" onchange="{!c.onChangeM}" />                  
+                            </td>
+                            <td data-label="Name">  
+                                <div class="slds-truncate" title="{!row.Name}">{!row.Name}</div>
+                            </td>
+                            <td data-label="Order">  
+                                <div class="slds-truncate" title="{!row.OrderNumber}">{!row.OrderNumber}</div>
+                            </td>
+                            <td data-label="Product">  
+                                <div class="slds-truncate" title="{!row.Product2_Description}">{!row.Product2_Description}</div>
+                            </td>
+                            <td data-label="Extended Warranty">  
+                                <div class="slds-truncate" title="{!row.Product_Extended_warranty_Warranty_Product_Name}">{!row.Product_Extended_warranty_Warranty_Product_Name}</div>
+                            </td>
+                            <td data-label="Country">  
+                                <div class="slds-truncate" title="{!row.isReturnSC}">
+                                    <lightning:input type="checkbox" checked="{!row.isReturnSC}" disabled="{!row.Product_Extended_warranty_Warranty_Product_Name == null || row.isEWCancelled}"/>
+                                </div>
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </aura:if>
+            </tbody>
+        </table>
+        <aura:if isTrue="{!not(empty(v.data))}">
+            <div class="demo-only demo-only--sizing slds-grid slds-wrap slds-m-around_x-small">
+                <div class="slds-size_12-of-12" style="margin-top: auto;">
+                    <div class="slds-clearfix">
+                        <div class="slds-float_right"> 
+                            <lightning:button variant="brand" label="Submit" iconName="utility:right" iconPosition="right" title="Submit" onclick="{! c.doSubmitAssets }" />
+                        </div>
+                    </div>
+                </div> 
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.showWarning}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container modalWidth">
+                    <header class="slds-modal__header">
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Confirm cancellation</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p><b>The extended warranty will be cancelled. Do you want to continue?
+                            </b>
+                        </p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral" label="Cancel" title="Cancel" onclick="{! c.closeModal }" />
+                        <lightning:button variant="brand" label="OK" title="OK" onclick="{!c.confirm}" />
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+        <aura:if isTrue="{!empty(v.data)}">
+            <div class="slds-align_absolute-center slds-box" style="height:4rem;font-size: larger;">No Records to display</div>
+        </aura:if>
+    </div>
+</aura:component>

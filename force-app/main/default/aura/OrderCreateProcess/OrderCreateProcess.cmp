@@ -1,0 +1,12 @@
+<aura:component  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_12-of-12" style="margin-top: auto;">
+            <div class="slds-clearfix">
+                <div class="slds-float_right"> 
+                    <lightning:button label="New Work Order" title="New Work Order" variant="brand" onclick="{!c.createRecord}"/>
+                    <lightning:button label="New Order" title="New Order" variant="brand" onclick="{!c.createRecord}"/>
+                </div>
+            </div> 
+        </div>
+    </div>
+</aura:component>

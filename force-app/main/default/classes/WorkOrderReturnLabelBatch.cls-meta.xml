@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexClass xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>36.0</apiVersion>
+    <packageVersions>
+        <majorNumber>4</majorNumber>
+        <minorNumber>27</minorNumber>
+        <namespace>zkfedex</namespace>
+    </packageVersions>
+    <packageVersions>
+        <majorNumber>1</majorNumber>
+        <minorNumber>53</minorNumber>
+        <namespace>zkmulti</namespace>
+    </packageVersions>
+    <packageVersions>
+        <majorNumber>3</majorNumber>
+        <minorNumber>11</minorNumber>
+        <namespace>zkups</namespace>
+    </packageVersions>
+    <status>Active</status>
+</ApexClass>

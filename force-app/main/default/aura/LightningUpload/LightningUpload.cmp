@@ -1,0 +1,52 @@
+<aura:component controller="MultipleFileUploadController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute access="public" name="accept" type="List" default="['.jpg', '.jpeg', '.pdf', '.gif','.png']"/>
+    <aura:attribute access="public" name="uploadedFiles" type="List" default=""/>
+    <aura:attribute access="public" name="sObjectAttachedFiles" type="List" default="[]"/>
+    <aura:attribute access="public" name="sObjectName" type="String" default=""/>
+    <aura:attribute access="public" name="sObjectId" type="String" default="0010v00000bF6OyAAK"/>
+    <aura:attribute type="Boolean" name="showLoader" default="false"/>
+    
+    <aura:attribute name="myDate" type="date" />
+    <aura:attribute name="dateValidationError" type="boolean" />
+    
+    <lightning:card>  
+        <aura:if isTrue="{!v.showLoader}">
+            <div class="demo-only">
+                <div class="slds-spinner_container">
+                    <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                        <span class="slds-assistive-text">Loading</span>
+                        <div class="slds-spinner__dot-a"></div>
+                        <div class="slds-spinner__dot-b"></div>
+                    </div>
+                </div>
+            </div>
+        </aura:if> 
+        
+        <div class="slds-p-around_medium">
+            <lightning:input 
+                             type="date"
+                             label="Renewal Date"
+                             value="{!v.myDate}"
+                             name="date"
+                             onchange="{!c.dateUpdate}" />      
+            <aura:if isTrue="{!v.dateValidationError}">
+                <div class="slds-text-color_error slds-p-left_x-small">
+                    Date must be in past
+                </div>
+            </aura:if>    
+            <br/>
+            <!-- <lightning:button disabled="{!v.dateValidationError}" variant="brand" onclick="{!c.submit}" label="Submit"></lightning:button>   -->
+            <lightning:button  variant="brand" onclick="{!c.submit}" label="Submit"></lightning:button>            
+        </div>       
+        <lightning:fileUpload name="fileUploader"
+                              multiple="false"
+                              accept="{!v.accept}"
+                              disabled="false"
+                              recordId=""
+                              onuploadfinished="{!c.handleUploadFinished}"/>
+        <div class="modal-footer slds-modal__footer">
+            <lightning:button label="Save" variant="brand" onclick="{!c.handleSaveClick}"/>
+            <lightning:button label="Cancel File Upload" variant="neutral" onclick="{!c.handleCancelUpload}"/>
+        </div>
+    </lightning:card>
+</aura:component>

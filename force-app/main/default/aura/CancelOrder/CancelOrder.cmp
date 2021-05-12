@@ -1,0 +1,18 @@
+<aura:component controller="Breville_GlobalButtonsHandler"  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:attribute name="recordId" type="String" access="public"/>
+    <aura:attribute name="objectConfig" type="object" access="public"/>
+    <aura:attribute type="Boolean" name="showLoader" default="true"/> 
+    <lightning:navigation aura:id="navLink"/>
+    <aura:handler name="init" value="{!this}" action="{!c.getCurrentRecordDetails}" />
+    <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if> 
+</aura:component>

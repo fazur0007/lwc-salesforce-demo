@@ -1,0 +1,9 @@
+.THIS .slds-modal__close{
+    border : 1px solid white;
+}
+.THIS .slds-modal__header{
+    text-align: inherit;
+}
+.THIS .modalWidth {
+    width: 30rem;
+}

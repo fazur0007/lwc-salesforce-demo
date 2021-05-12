@@ -1,0 +1,201 @@
+<template>
+	<div style="background-color: #fff; position: relative;" class="slds-p-around_medium">
+		<div if:true={showSpinner}>
+			<lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+		</div>
+		<template if:true={isModalOpen}>
+			<section class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container">
+					<header class="slds-modal__header">
+						<button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+							<lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small"></lightning-icon>
+							<span class="slds-assistive-text">Close</span>
+						</button>
+						<h2 class="slds-text-heading_medium slds-hyphenate">Employee Details</h2>
+					</header>
+					<div class="slds-modal__content">
+						<div class="slds-modal__content slds-p-around--medium">
+							<div class="slds-form" role="list">
+								<div class="slds-form__row">
+									<div class="slds-form__item" role="listitem">
+										<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+											<span class="slds-form-element__label">FirstName</span>
+											<div class="slds-form-element__control">
+												<div class="slds-form-element__static"> {rowDetails.FirstName} </div>
+											</div>
+										</div>
+									</div>
+									<div class="slds-form__item" role="listitem">
+										<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+											<span class="slds-form-element__label">LastName</span>
+											<div class="slds-form-element__control">
+												<div class="slds-form-element__static"> {rowDetails.LastName} </div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-form__row">
+									<div class="slds-form__item" role="listitem">
+										<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+											<span class="slds-form-element__label">Name</span>
+											<div class="slds-form-element__control">
+												<div class="slds-form-element__static"> {rowDetails.Name} </div>
+											</div>
+										</div>
+									</div>
+									<div class="slds-form__item" role="listitem">
+										<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+											<span class="slds-form-element__label">Email</span>
+											<div class="slds-form-element__control">
+												<div class="slds-form-element__static"> {rowDetails.Email} </div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-form__row">
+									<div class="slds-form__item" role="listitem">
+										<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+											<span class="slds-form-element__label">Phone</span>
+											<div class="slds-form-element__control">
+												<div class="slds-form-element__static"> {rowDetails.Phone} </div>
+											</div>
+										</div>
+									</div>
+									<div class="slds-form__item" role="listitem">
+										<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+											<span class="slds-form-element__label">Phone</span>
+											<div class="slds-form-element__control">
+												<div class="slds-form-element__static"> {rowDetails.Phone} </div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<div class="slds-backdrop slds-backdrop_open"></div>
+		</template>
+		<div style="display:flow-root;">
+			<div class="slds-grid slds-gutters">
+				<div class="slds-col">
+					<div style="float:left">
+						<lightning-combobox name="object" variant="label-hidden" disabled={disableCombobox} value={recordSize} placeholder="Record Size" options={getRecordSizeList} onchange={handleRecordSizeChange}></lightning-combobox>
+					</div>
+				</div>
+				<div class="slds-col">
+					<lightning-input type="search" onchange={handleKeyChange} class="slds-m-bottom_small" label="Search" value={searchKey} variant="label-hidden" placeholder="Type to search..."></lightning-input>
+				</div>
+				<div class="slds-col">
+					<div style="float:right">
+						<lightning-button variant="brand" icon-name="utility:jump_to_left" label="First" disabled={disablePreviousButtons} class="slds-m-top_medium" onclick={handleNavigation}></lightning-button> &nbsp; <lightning-button variant="brand" icon-name="utility:left" label="Previous" disabled={disablePreviousButtons} class="slds-m-top_medium" onclick={handleNavigation}></lightning-button> &nbsp; <lightning-button variant="brand" icon-name="utility:right" label="Next" disabled={disableNextButtons} class="slds-m-top_medium" onclick={handleNavigation}></lightning-button> &nbsp; <lightning-button variant="brand" label="Last" icon-name="utility:jump_to_right" disabled={disableNextButtons} class="slds-m-top_medium" onclick={handleNavigation}></lightning-button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br />
+		<div>
+			<table style="table-layout:fixed;width:100%;border-collapse: collapse;height: 40px;white-space: break-spaces;" class="slds-table slds-border_left slds-border_right slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+				<tr class="slds-line-height_reset slds-text-title_caps">
+					<!--
+					<th class="" style="width: 77px;background: #9fbfdf;color: #000000;font-weight: bolder;" scope="col">
+						<div class="slds-truncate slds-size_1-of-6 ">
+							<lightning-input onchange={allSelected} type="checkbox"></lightning-input>
+						</div>
+					</th>
+				-->
+					<th class="slds-size_1-of-6 " scope="col" style="background: lightsteelblue;color: #000000;font-weight: bolder;width: 85px;">
+						<div class="slds-truncate" style="white-space: break-spaces;font-family: Montserrat,sans-serif;padding: 3px;" title="Action">Action</div>
+						<lightning-input type="text" readonly></lightning-input>
+					</th>
+					<th class="slds-size_1-of-6 " scope="col" style="background: lightsteelblue;color: #000000;font-weight: bolder;">
+						<div class="slds-truncate" style="white-space: break-spaces;font-family: Montserrat,sans-serif;padding: 3px;" title="Name">Name</div>
+						<lightning-input type="text" onchange={handleKeyChange} class="slds-m-bottom_small" label="Search" value={searchKey} variant="label-hidden" placeholder="Search Name"></lightning-input>
+					</th>
+					<th class="slds-size_1-of-6 " scope="col" style="background: lightsteelblue;color: #000000;font-weight: bolder;">
+						<div class="slds-truncate" style="white-space: break-spaces;font-family: Montserrat,sans-serif;padding: 3px;" title="First Name">First Name</div>
+						<lightning-input type="text" onchange={handleKeyChange} class="slds-m-bottom_small" label="Search" value={searchKey} variant="label-hidden" placeholder="Search First Name"></lightning-input>
+					</th>
+					<th class="slds-size_1-of-6 " scope="col" style="background: lightsteelblue;color: #000000;font-weight: bolder;">
+						<div class="slds-truncate" style="white-space: break-spaces;font-family: Montserrat,sans-serif;padding: 3px;" title="Last Name">Last Name</div>
+						<lightning-input type="text" onchange={handleKeyChange} class="slds-m-bottom_small" label="Search" value={searchKey} variant="label-hidden" placeholder="Search Last Name"></lightning-input>
+					</th>
+					<th class="slds-size_1-of-6 " scope="col" style="background: lightsteelblue;color: #000000;font-weight: bolder;">
+						<div class="slds-truncate" style="white-space: break-spaces;font-family: Montserrat,sans-serif;padding: 3px;" title="Phone">Phone</div>
+						<lightning-input type="text" onchange={handleKeyChange} class="slds-m-bottom_small" label="Search" value={searchKey} variant="label-hidden" placeholder="Search Phone"></lightning-input>
+					</th>
+					<th class="slds-size_1-of-6 " scope="col" style="background: lightsteelblue;color: #000000;font-weight: bolder;">
+						<div class="slds-truncate" style="white-space: break-spaces;font-family: Montserrat,sans-serif;padding: 3px;" title="Email">Email</div>
+						<lightning-input type="text" onchange={handleKeyChange} class="slds-m-bottom_small" label="Search" value={searchKey} variant="label-hidden" placeholder="Search Email"></lightning-input>
+					</th>
+				</tr>
+			</table>
+			<div class="slds-scrollable" style="overflow:auto;">
+				<div style="display: block; height: 330px;overflow-y: auto;overflow-x: hidden;">
+					<table style="table-layout:fixed;width:101%;border-collapse: collapse;" class="slds-table slds-border_left slds-border_right slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+						<tbody>
+							<template for:each={displayRecords} for:item="account">
+								<tr key={account.Id}>
+									<!--
+									<th scope="col" style="width: 77px;" class="slds-size_1-of-6">
+										<div>
+											<lightning-input type="checkbox" value={account.Name} data-id={account.Id}></lightning-input>
+										</div>
+									</th>
+								-->
+									<td class="slds-size_1-of-6" style="width: 85px;">
+										<div class="buttonMenu">
+											<lightning-button-menu alternative-text="Toggle menu" icon-name="utility:threedots">
+												<P onclick={viewDetails} data-recid={account.Id}>
+													<lightning-menu-item label="View">
+													</lightning-menu-item>
+												</P>
+												<p onclick={editDetails} data-recid={account.Id}>
+													<lightning-menu-item label="Edit">
+													</lightning-menu-item>
+												</p>
+											</lightning-button-menu>
+										</div>
+									</td>
+									<th scope="col" class="slds-size_1-of-6">
+										<div>{account.Name}</div>
+									</th>
+									<th scope="col" class="slds-size_1-of-6">
+										<div>{account.FirstName}</div>
+									</th>
+									<th scope="col" class="slds-size_1-of-6">
+										<div>{account.LastName}</div>
+									</th>
+									<th scope="col" class="slds-size_1-of-6">
+										<div>
+											<lightning-formatted-phone value={account.Phone}></lightning-formatted-phone>
+										</div>
+									</th>
+									<th scope="col" class="slds-size_1-of-6">
+										<div>
+											<lightning-formatted-email value={account.Email}></lightning-formatted-email>
+										</div>
+									</th>
+								</tr>
+							</template>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<br />
+			<div class="slds-grid slds-gutters">
+				<div class="slds-col">
+				</div>
+				<div class="slds-col">
+				</div>
+				<div class="slds-col">
+					<div style="text-align:right;font-weight:bold;"> {recordViewMessage} </div>
+				</div>
+			</div>
+		</div>
+		<template if:true={isPanelExpand}>
+			
+		</template>
+	</div>
+</template>

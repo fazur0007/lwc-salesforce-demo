@@ -1,0 +1,58 @@
+<aura:component controller="Ltng_WorkOrdersUtil_Ctl"  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:attribute name="recordId" type="String" access="public"/>
+    <aura:attribute name="caseconfig" type="object" access="public"/>
+    <aura:attribute type="Boolean" name="showLoader" default="true"/>
+    <aura:attribute type="Boolean" name="isBoxorderoptionshow" default="false"/>
+    <lightning:navigation aura:id="navLink"/>
+    <aura:attribute name="optionValue" type="String" default="No"/>
+    <aura:attribute name="Boxorderoption" type="String" default="No"/>
+    <aura:attribute name="options" type="List" default="[
+                                                        {'label': 'Yes', 'value': 'Yes'},
+                                                        {'label': 'No', 'value': 'No'}
+                                                        ]"/>
+    <aura:attribute name="Boxorderoptions" type="List" default="[
+                                                                {'label': 'Yes', 'value': 'Yes'},
+                                                                {'label': 'No', 'value': 'No'}
+                                                                ]"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" access="public"/>
+    <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <div class="demo-only demo-only--sizing slds-grid slds-wrap slds-m-around_x-small">
+        <div class="slds-size_12-of-12" style="margin-top: auto;">
+            <div class="slds-clearfix">
+                <div class="slds-float_left"> 
+                    <lightning:radioGroup name="optionValue" 
+                                          aura:id="options"
+                                          label="Do you wish to auto create Return Label after the payment ?"
+                                          options="{! v.options }"
+                                          value="{! v.optionValue }"
+                                          type="radio"
+                                          onchange="{! c.handleBrandValue }"
+                                          />
+                    <br/>
+                    <aura:if isTrue="{!v.isBoxorderoptionshow}">
+                        <lightning:radioGroup name="Boxorderoptions" 
+                                              aura:id="Boxorderoptions"
+                                              label="Do you want to create Box order for this work order?"
+                                              options="{! v.Boxorderoptions }"
+                                              value="{! v.Boxorderoption }"
+                                              type="radio"
+                                              />
+                    </aura:if>
+                    <br/>
+                    <lightning:button  variant="Neutral" label="Cancel" title="Cancel" onclick="{! c.handleCancel }" /> 
+                    <lightning:button variant="brand" label="Submit" iconName="utility:right" iconPosition="right" title="Submit" onclick="{! c.doSubmit }" />
+                </div>
+            </div>                 
+        </div> 
+    </div>
+</aura:component>

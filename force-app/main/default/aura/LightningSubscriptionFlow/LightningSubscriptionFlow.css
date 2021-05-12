@@ -1,0 +1,16 @@
+.THIS .slds-modal__close .slds-button{
+    border : 1px solid white;
+}
+.THIS .slds-modal__header{
+    text-align: inherit;
+}
+.THIS .slds-icon{
+    fill:darkorange;
+}
+.THIS .slds-button .slds-button_brand{
+    background: #391538;
+}
+.THIS .slds-radio {  
+    display: inline !important;  
+    font-weight: bolder !important;
+}

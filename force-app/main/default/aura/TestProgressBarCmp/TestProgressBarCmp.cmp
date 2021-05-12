@@ -1,0 +1,67 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+    <!-- Init handler -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+   <!-- Progress Indicator STARTS -->
+        <div style="text-align:center">
+            <div class="circle-parent">
+                <span class="circle cicrle-top-padding" aura:id="circle1">
+                    <aura:if isTrue="{!lessthanorequal(v.intCurrentStep, 1)}">
+                        <div class="cicrle-top-padding-step">1</div>
+                    	<aura:set attribute="else">
+                        	<lightning:icon class="activeStep activeBackground" aura:id="check1" iconName="action:check" alternativeText="Completed" title="Completed" size="x-small"/>
+                        </aura:set>
+                    </aura:if>
+                </span>
+                <span class="stepLabel" aura:id="label1">Step 1</span>
+            </div>
+            <span class="line" aura:id="line1"></span>
+            <div class="circle-parent">
+                <span class="circle" aura:id="circle2">
+                	<aura:if isTrue="{!lessthanorequal(v.intCurrentStep, 2)}">
+                        <div class="cicrle-top-padding-step">2</div>
+                    	<aura:set attribute="else">
+                        	<lightning:icon class="activeStep activeBackground" aura:id="check1" iconName="action:check" alternativeText="Completed" title="Completed" size="x-small"/>
+                        </aura:set>
+                    </aura:if>
+                </span>
+                <span class="stepLabel" aura:id="label2">Step 2</span>
+            </div>
+            <span class="line" aura:id="line2"></span>
+            <div class="circle-parent">
+                <span class="circle" aura:id="circle3">
+                	<aura:if isTrue="{!lessthanorequal(v.intCurrentStep, 3)}">
+                        <div class="cicrle-top-padding-step">3</div>
+                    	<aura:set attribute="else">
+                        	<lightning:icon class="activeStep activeBackground" aura:id="check1" iconName="action:check" alternativeText="Completed" title="Completed" size="x-small"/>
+                        </aura:set>
+                    </aura:if>
+                </span>
+                <span class="stepLabel" aura:id="label3">Step 3</span>
+            </div>
+            <span class="line" aura:id="line3"></span>
+            <div class="circle-parent">
+                <span class="circle" aura:id="circle4">
+                	<aura:if isTrue="{!lessthanorequal(v.intCurrentStep, 4)}">
+                        <div class="cicrle-top-padding-step">4</div>
+                    	<aura:set attribute="else">
+                        	<lightning:icon class="activeStep activeBackground" aura:id="check1" iconName="action:check" alternativeText="Completed" title="Completed" size="x-small"/>
+                        </aura:set>
+                    </aura:if>
+                </span>
+                <span class="stepLabel" aura:id="label4">Step 4</span>
+            </div>
+            <span class="line" aura:id="line4"></span>
+            <div class="circle-parent">
+                <span class="circle" aura:id="circle5">
+                	<aura:if isTrue="{!lessthanorequal(v.intCurrentStep, 5)}">
+                        <div class="cicrle-top-padding-step">5</div>
+                    	<aura:set attribute="else">
+                        	<lightning:icon class="activeStep activeBackground" aura:id="check1" iconName="action:check" alternativeText="Completed" title="Completed" size="x-small"/>
+                        </aura:set>
+                    </aura:if>
+                </span>
+                <span class="stepLabel " aura:id="label5">Step 5</span>
+            </div>
+        </div>
+        <!-- Progress Indicator ENDS -->
+</aura:component>

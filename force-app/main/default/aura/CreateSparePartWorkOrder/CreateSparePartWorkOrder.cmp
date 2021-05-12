@@ -1,0 +1,115 @@
+<aura:component controller="LWC_CreateSparePartOrder_Cls" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" 
+                access="global" >
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute type="Boolean" name="showLoader" default="true"/>
+    <lightning:navigation aura:id="navLink"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:html tag="style">
+        .slds-modal__container{ 
+        height: 85%;
+        width: 87%;
+        max-width: 377vh !important;
+        max-height: 300vh !important; 
+        } 
+        .modal-body{ 
+        height : 300vh !important; 
+        max-height: 1000vh !important; 
+        } 
+        .slds-modal__footer{ 
+        display: inline !important; 
+        }
+    </aura:html>
+    
+    <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <br/>
+    <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_12-of-12" style="margin-top: auto;">
+            <div class="slds-clearfix">
+                <div class="slds-float_right"> 
+                    <lightning:button variant="brand" label="Save" title="Save" iconName="utility:save" iconPosition="right" onclick="{! c.doSaveLineItems }" disabled="{!empty(v.data)}"/>
+                    <lightning:button variant="brand" label="Cancel" title="Cancel" onclick="{! c.handleCancel }" />                        
+                </div>
+            </div> 
+        </div>
+    </div>
+    <lightning:card title="Select Spare Parts" iconName="custom:custom63">
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+            <thead>
+                <tr class="slds-text-title_caps" style="height: 35px !important;">
+                    <th scope="col"> 
+                        <strong><div class="slds-truncate">Action</div></strong>
+                    </th>
+                    <th scope="col"> 
+                        <strong><div class="slds-truncate">SKU</div></strong>
+                    </th>
+                    <th scope="col">                                        
+                        <strong><div class="slds-truncate">Product Description</div></strong>
+                    </th>
+                    <th scope="col">
+                        <strong><div class="slds-truncate">Available to Sell</div></strong>
+                    </th>
+                    <th scope="col">
+                        <strong><div class="slds-truncate">Quantity</div></strong>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:if isTrue="{!not(empty(v.data))}">
+                    <aura:iteration items="{!v.data}" var="pbeRec" indexVar="index"> 
+                        <tr  data-selected-Index="{!index}">
+                            <td scope="row" data-label="sectIdx" title="{!pbeRec.isSelected}">
+                                <label class="slds-checkbox">
+                                    <ui:inputCheckbox  class="slds-checkbox--faux" aura:id="checkAccountId" value="{!pbeRec.isSelected}" text="{!pbeRec.productId}"/>
+                                    <span class="slds-checkbox--faux"></span>
+                                    <span class="slds-form-element__label text"></span>
+                                </label>
+                            </td>
+                            <td scope="row" data-label="sectIdx" title="{!pbeRec.productSKU}">
+                                <div class="slds-truncate">{!pbeRec.productSKU}</div>
+                            </td>
+                            <td scope="row" data-label="sectIdx" title="{!pbeRec.description}">
+                                <div class="slds-truncate">{!pbeRec.description}</div>
+                            </td>
+                            <td scope="row" data-label="sectIdx" title="{!pbeRec.isAvailable}">
+                                <div class="slds-truncate">
+                                    <ui:inputCheckbox  class="slds-checkbox--faux" disabled="true" value="{!pbeRec.isAvailable}" text="{!pbeRec.isAvailable}"/>
+                                </div>
+                            </td>
+                            <td scope="row" data-label="sectIdx" title="{!pbeRec.quantity}">
+                                <div class="slds-truncate">
+                                    <lightning:input aura:id="field" min="1.0" required="true" type="number" value="{!pbeRec.quantity}"/> 
+                                </div>
+                            </td>
+                        </tr>
+                    </aura:iteration>
+                </aura:if>
+            </tbody>
+        </table>
+        <aura:if isTrue="{!empty(v.data)}">                        
+            <div class="slds-align_absolute-center slds-box" style="height:4rem;font-size: larger;">No Spare Parts found for the selected WorkOrders</div>
+        </aura:if>
+        <br/>
+    </lightning:card>
+    <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_12-of-12" style="margin-top: auto;">
+            <div class="slds-clearfix">
+                <div class="slds-float_right"> 
+                    <lightning:button variant="brand" label="Save" title="Save" iconName="utility:save" iconPosition="right" onclick="{! c.doSaveLineItems }" disabled="{!empty(v.data)}"/>
+                    <lightning:button variant="brand" label="Cancel" title="Cancel" onclick="{! c.handleCancel }" />                        
+                </div>
+            </div> 
+        </div>
+    </div>
+</aura:component>

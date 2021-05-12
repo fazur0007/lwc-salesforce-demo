@@ -1,0 +1,312 @@
+<aura:component controller="LightningCreateReturnLabelCaseCtrl" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global" >
+    <aura:attribute name="recordId" type="String" />
+    <lightning:navigation aura:id="navLink"/>
+    <aura:attribute name="ShowReturn" type="Boolean" default="true"/>
+    <aura:attribute name="ShowOutbound" type="Boolean" default="false"/> 
+    <aura:attribute name="workingObject" type="String" default="Case"/>
+    <aura:attribute name="workingObjectId" type="String" />
+    <aura:attribute name="selectedShippingCarrier" type="String" /> 
+    <aura:attribute name="selectedServiceType" type="String" />
+    <aura:attribute name="returnDescriptionCls" type="String" default="ACCOMODATION"/>
+    <aura:attribute name="refNumber" type="String" default=""/>
+    <aura:attribute name="returnLabelFor" type="String" default="Return Location"/>
+    <aura:attribute name="configShipmentDetails" type="Object"/>
+    <aura:attribute name="dimension" type="Object"/>
+    <aura:attribute name="configDetails" type="Object"/>
+    <aura:attribute name="shipmentDetails" type="Object"/>
+    <aura:attribute name="isSuccess" type="Boolean" default="false"/>
+    <aura:attribute name="isValid" type="Boolean" default="true"/>
+    <aura:attribute name="isCreateLabelIntiate" type="Boolean" default="false"/>
+    <aura:attribute name="createBoxOrder" type="Boolean" default="false"/> 
+    <aura:attribute type="Boolean" name="showLoader" default="true"/>
+    <aura:attribute name="shipmentSetting" type="ShipmentSetting__c" />
+    <aura:attribute name="shipmateSet" type="ShipmentSetting__c" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInitOperations}"/>
+    
+    <aura:html tag="style">
+        .slds-modal__container{ 
+        height: 101%;
+        width: 93%;
+        max-width: 377vh !important;
+        max-height: 300vh !important; 
+        } 
+        .modal-body{ 
+        height : 300vh !important; 
+        max-height: 1000vh !important; 
+        } 
+        .slds-modal__footer{ 
+        display: inline !important; 
+        }
+    </aura:html>
+    <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if> 
+    
+    <lightning:card>
+        <aura:if isTrue="{!v.configDetails.RA_Tracking != ''}"> 
+            <center><span style="color: red;">Already a Shipment record is associated with this Case</span></center>
+        </aura:if>
+        <aura:if isTrue="{!v.configDetails.ReturnLocation == Null}"> 
+            <center><span style="color: red;">{!$Label.c.PleaseSelectReturnLocation}</span></center>
+        </aura:if>
+        <aura:if isTrue="{!v.configDetails.hasWorkOrder}"> 
+            <center><span style="color: red;">{!$Label.c.CreateReturnLabelWorkOrderError}</span></center>
+        </aura:if>
+        
+        <aura:if isTrue="{!and(v.configDetails.RA_Tracking == '', v.configDetails.ReturnLocation != Null)}">
+            <aura:if isTrue="{!!v.configDetails.hasWorkOrder}">
+                <aura:if isTrue="{!!v.isCreateLabelIntiate}">
+                <div class="c-container">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem padding="around-small" size="12">
+                            <div class="page-section page-header">
+                                <aura:if isTrue="{!!v.isCreateLabelIntiate}">
+                                    <center>
+                                        <lightning:buttonGroup>
+                                            <aura:if isTrue="{!v.ShowReturn}">
+                                                <lightning:button variant="brand" label="Create Return Label" title="Create Return Label" onclick="{! c.doCreateReturnLabel }" />
+                                            </aura:if>
+                                            <aura:if isTrue="{!v.ShowOutbound}">
+                                                <lightning:button variant="Neutral" label="Create Outbound Label" onclick="{! c.doCreateOutboundLabel }"/>
+                                            </aura:if>
+                                        </lightning:buttonGroup>
+                                    </center>
+                                </aura:if>
+                            </div>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+            </aura:if>
+            <aura:if isTrue="{!v.isCreateLabelIntiate}">
+                <aura:if isTrue="{!!v.isSuccess}">
+                    <div class="slds-form" role="list">
+                        <div class="slds-form__row">
+                            <aura:if isTrue="{!and(v.configShipmentDetails.caseRecord.Product__r.Service_Return_Box__c != null,v.configShipmentDetails.isReturn)}">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                        <span class="slds-form-element__label">Create Box Order</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static">
+                                                <lightning:input type="checkbox" checked="{!v.createBoxOrder}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!and(v.configShipmentDetails.caseRecord.Product__r.Service_Return_Box__c != null,v.configShipmentDetails.isReturn)}">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                    </div>
+                                </div>
+                            </aura:if>
+                        </div>
+                        
+                        <div class="slds-form__row">
+                            <aura:if isTrue="{!v.configShipmentDetails.shippingCarriersSize > 1}">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                        <span class="slds-form-element__label">Shipping Carrier</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static">
+                                                <lightning:select aura:id="selectedShippingCarrier"  name="selectedShippingCarrier" value="{!v.selectedShippingCarrier}" onchange="{! c.doSelectShippingCarrier }">
+                                                    <aura:iteration items="{!v.configShipmentDetails.shippingCarriers}" var="shippingValues">
+                                                        <option text="{!shippingValues.label}" value="{!shippingValues.value}" selected="{shippingValues.selected}"/>
+                                                    </aura:iteration>
+                                                </lightning:select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!v.configShipmentDetails.shippingCarriersSize == 0}"> 
+								<div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                        <span class="slds-form-element__label">Shipping Carrier</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static">{!v.shipmentSetting.ShippingCarrier__c}</div>
+										</div>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static">
+                                                <lightning:recordEditForm objectApiName="ShipmentSetting__c">
+                                                    <div style="display:none;">
+                                                        <lightning:inputField fieldName="ShippingCarrier__c" value="{!v.shipmentSetting.ShippingCarrier__c}"/>
+                                                    </div>
+                                                	<lightning:inputField fieldName="ServiceType__c" value="{!v.shipmentSetting.ServiceType__c}"/>
+                           						</lightning:recordEditForm>
+                                            </div>
+                                        </div>
+                                    </div>
+                           </div>
+                        </div>
+                        
+                        <div class="slds-form__row">
+                            <aura:if isTrue="{!v.returnLabelFor == 'Service Center'}">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                        <span class="slds-form-element__label">Service Center</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static">
+                                                {!v.configShipmentDetails.caseRecord.Service_Center__r.Name}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!v.returnLabelFor == 'Return Location'}">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                        <span class="slds-form-element__label">Return Location</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static">
+                                                {!v.configShipmentDetails.caseRecord.ReturnLocation__r.Name}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!v.returnLabelFor == 'Service Center'}">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                        <span class="slds-form-element__label">Address</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static">
+                                                {!v.configShipmentDetails.caseRecord.Service_Center__r.ShippingStreet}
+                                                <br/>
+                                                {!v.configShipmentDetails.caseRecord.Service_Center__r.ShippingCity},
+                                                {!v.configShipmentDetails.caseRecord.Service_Center__r.ShippingState}
+                                                {!v.configShipmentDetails.caseRecord.Service_Center__r.ShippingPostalCode}
+                                                <br />
+                                                {!v.configShipmentDetails.caseRecord.Service_Center__r.ShippingCountry}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!v.returnLabelFor == 'Return Location'}">
+                                <div class="slds-form__item" role="listitem">
+                                    <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                        <span class="slds-form-element__label">Address</span>
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__static">
+                                                {!v.configShipmentDetails.caseRecord.ReturnLocation__r.ShippingStreet}
+                                                <br />
+                                                {!v.configShipmentDetails.caseRecord.ReturnLocation__r.ShippingCity},
+                                                {!v.configShipmentDetails.caseRecord.ReturnLocation__r.ShippingState}
+                                                {!v.configShipmentDetails.caseRecord.ReturnLocation__r.ShippingPostalCode}
+                                                <br />
+                                                {!v.configShipmentDetails.caseRecord.ReturnLocation__r.ShippingCountry}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aura:if>
+                        </div>
+                        
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                    <span class="slds-form-element__label">Product</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static">
+                                            {!v.configShipmentDetails.caseRecord.Product__r.Name}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                    <span class="slds-form-element__label">Declared Value</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static">
+                                            <lightning:input aura:id="Landed_Cost" value="{!v.configShipmentDetails.caseRecord.Product__r.Landed_Cost__c}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="slds-form__row">
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                    <span class="slds-form-element__label">Weight ({!v.dimension.weightUnits})</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static">
+                                            <lightning:input aura:id="dimension_weight" value="{!v.dimension.weight}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-form__item" role="listitem">
+                                <div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+                                    <span class="slds-form-element__label">Dimension ({!v.dimension.dimensionUnits})</span>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-form-element__static">
+                                            <ul class="slds-list_horizontal slds-has-block-links">
+                                                <li style="margin: 19px;">
+                                                    L:
+                                                </li>
+                                                <li>
+                                                    <lightning:input aura:id="dimension_length" value="{!v.dimension.length}" style="width:70px;margin: -10px;"/>
+                                                </li>
+                                                <li style="margin: 19px;">
+                                                    W:
+                                                </li>
+                                                <li>
+                                                    <lightning:input aura:id="dimension_width" value="{!v.dimension.width}"  style="width:70px;margin: -10px;"/>
+                                                </li>
+                                                <li style="margin: 19px;">
+                                                    H:
+                                                </li>
+                                                <li>
+                                                    <lightning:input aura:id="dimension_height" value="{!v.dimension.height}" style="width:70px;margin: -10px;"/>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-form__row">
+                            <lightning:input  value="{!v.shipmentSetting.ShippingCarrier__c}" style="display:none;"/>
+                        </div>
+                    </div>
+                </aura:if>
+            </aura:if>
+            <aura:if isTrue="{!!v.isSuccess}">
+                <div class="slds-clearfix" style="margin: inherit;">
+                    <div class="slds-float_right">
+                        <aura:if isTrue="{!v.isCreateLabelIntiate}">
+                            <aura:if isTrue="{!!v.isSuccess}">
+                                <lightning:buttonGroup>
+                                    <aura:if isTrue="{!v.isValid}">
+                                        <lightning:button variant="brand" label="Confirm" title="Confirm" onclick="{! c.doCreateReturnShipmate }" />
+                                    </aura:if>
+                                    <aura:if isTrue="{!!v.isValid}">
+                                        <lightning:button variant="brand" disabled="true" label="Confirm" title="Confirm"/>
+                                    </aura:if>
+                                    <lightning:button variant="Neutral" disabled="false" label="Cancel" title="Confirm" onclick="{! c.doCancel }" />
+                                </lightning:buttonGroup>
+                            </aura:if>
+                        </aura:if>
+                    </div>
+                </div>
+            </aura:if>
+        </aura:if>
+        </aura:if>
+    </lightning:card>
+</aura:component>

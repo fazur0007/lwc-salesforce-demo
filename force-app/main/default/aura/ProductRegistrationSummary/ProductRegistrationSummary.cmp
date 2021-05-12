@@ -1,0 +1,127 @@
+<aura:component controller="ProductRegistrationLightningController">
+    <aura:attribute name="accountId" type="String" />
+    <aura:attribute name="assetId" type="String" />
+    <aura:attribute name="accountRecord" type="Account" />
+    <aura:attribute name="assetRecord" type="Asset" />
+    <aura:attribute name="receiptURL" type="String" />
+    <aura:attribute name="receiptName" type="String" />
+    <aura:attribute name="modelName" type="String" />
+    <aura:attribute name="productName" type="String" />
+    <aura:attribute name="isLoad" type="Boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="saveInAccount" type="Account"  />
+    <aura:attribute name="saveInAsset" type="Asset"/>
+    <aura:if isTrue="{!v.isLoad}">
+        <lightning:recordEditForm aura:id="recordEditFormSubmit" objectApiName="Account">
+        <div class="slds-p-around_xx-large">
+            <div class="slds-page-header">
+                <h1 class="slds-text-heading--label slds-p-top_large">Review</h1>
+            </div>
+            <div class="slds-form">
+                <div class="slds-page-header">
+                    <h2 class="slds-p-top_large">Your Purchase <a onclick = "{!c.purchaseEdit}" style="margin:18rem" >Edit</a></h2> 
+                </div>
+                <div class="slds-form-element slds-form-element_horizontal">
+                    <label class="slds-form-element__label" >Product:</label>
+                    <div class="slds-form-element__control">
+                        <ui:outputText value="{!v.saveInAsset.Warranty_Product_Sub_Category__c}" />
+                    </div>
+                    <br/>
+                </div>   
+                <div class="slds-form-element slds-form-element_horizontal">
+                    <label class="slds-form-element__label" >Model:</label>
+                    <div class="slds-form-element__control">
+                        <ui:outputText value="{!v.saveInAsset.Product}" />
+                    </div>
+                    <br/>
+                </div> 
+                <div class="slds-form-element slds-form-element_horizontal">
+                    <label class="slds-form-element__label" >Serail Number:</label>
+                    <div class="slds-form-element__control">
+                        <ui:outputText value="{!v.saveInAsset.SerialNumber}" />
+                    </div>
+                    <br/>
+                </div> 
+                <div class="slds-form-element slds-form-element_horizontal">
+                    <label class="slds-form-element__label" >Date of Purchase:</label>
+                    <div class="slds-form-element__control">
+                        <ui:outputText value="{!v.saveInAsset.PurchaseDate}" />
+                    </div>
+                    <br/>
+                </div> 
+                <div class="slds-form-element slds-form-element_horizontal">
+                    <label class="slds-form-element__label" >Receipt:</label>
+                    <div class="slds-form-element__control">
+                        <a href="{!v.saveInAsset.attachment}">{!v.saveInAsset.attachment}</a>
+                    </div>
+                    <br/>
+                </div> 
+            </div>
+            <div class="slds-form">
+                <div class="slds-page-header">
+                    <h2 class="slds-p-top_large">Your Delivery <a onclick = "{!c.deliveryEdit}" style="margin:18rem" >Edit</a> </h2>
+                </div>
+                <div class="slds-form-element slds-form-element_horizontal">
+                    <label class="slds-form-element__label" >Name:</label>
+                    <div class="slds-form-element__control">
+                        <ui:outputText value="{!v.saveInAccount.FirstName}" />
+                    </div>
+                    <br/>
+                </div>
+                <div class="slds-form-element slds-form-element_horizontal">
+                    <label class="slds-form-element__label" >Phone:</label>
+                    <div class="slds-form-element__control">
+                        <!--<ui:outputText value="{!v.accountRecord.Phone}" />-->
+                        <ui:outputText value="{!v.saveInAccount.Phone}" />
+                    </div>
+                    <br/>
+                </div>
+                <div class="slds-form-element slds-form-element_horizontal">
+                    <label class="slds-form-element__label" >Address line 1:</label>
+                    <div class="slds-form-element__control">
+                        <ui:outputText value="{!v.saveInAccount.BillingStreet}" />
+                    </div>
+                    <br/>
+                </div>
+                <div class="slds-form-element slds-form-element_horizontal">
+                    <label class="slds-form-element__label" >Address line 2:</label>
+                    <div class="slds-form-element__control">
+                        <ui:outputText value="{!v.saveInAccount.Billing_Street_Line_1__c}" />
+                    </div>
+                    <br/>
+                </div>
+                <br/>
+                <div class="slds-form-element slds-form-element_horizontal">
+                    <label class="slds-form-element__label" >City:</label>
+                    <div class="slds-form-element__control">
+                        <ui:outputText value="{!v.saveInAccount.BillingCity}" />
+                    </div>
+                    <br/>
+                </div>
+                <div class="slds-form-element slds-form-element_horizontal">
+                   
+                       <label for="BillingStateCode">StateTest</label>
+                        <lightning:inputfield aura:id="BillingStateCode" fieldName="BillingStateCode"   variant="label-hidden" value="{!v.saveInAccount.BillingState}" disabled = "true"/>
+
+                </div>
+                <div class="slds-form-element slds-form-element_horizontal">
+                    <label class="slds-form-element__label" >PostalCode:</label>
+                    <div class="slds-form-element__control">
+                        <ui:outputText value="{!v.saveInAccount.BillingPostalCode}" />
+                    </div>
+                    <br/>
+                </div>
+                <div class="slds-form-element slds-form-element_horizontal">
+                     <label for="BillingCountryCode">Country</label>
+                       <lightning:inputfield aura:id="BillingCountryCode" fieldName="BillingCountryCode"  variant="label-hidden" value="{!v.saveInAccount.BillingCountry}" disabled = "true"/>
+                    <br/>
+                </div>
+            </div>
+             <lightning:buttonGroup class="slds-p-top_medium slds-align_absolute-center">
+                 <div class = "slds-m-left_x-large"><lightning:button label="Back" variant="brand" onclick = "{!c.back}" /></div>
+                 <div class ="slds-m-left_x-large"><lightning:button label="Submit Claim" variant="brand" onclick = "{!c.submitClaim}"/></div>
+    		</lightning:buttonGroup>
+        </div>
+        </lightning:recordEditForm>      
+    </aura:if>
+</aura:component>

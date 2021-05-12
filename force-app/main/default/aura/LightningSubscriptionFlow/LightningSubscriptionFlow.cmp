@@ -1,0 +1,239 @@
+<aura:component controller="GetSubscriptionsFromEPUtility" implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:isUrlAddressable,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" 
+                access="global">
+    <aura:attribute name="recordId" type="String" />
+    <lightning:navigation aura:id="navLink"/> 
+    <aura:attribute name="selectedRecord" type="String" />
+    <aura:attribute name="highlightRow" type="String" />
+    <aura:attribute name="Message" type="String" />
+    <aura:attribute type="Boolean" name="showLoader" default="true"/>
+    <aura:attribute type="Boolean" name="showOrders" default="false"/>
+    <aura:attribute name="data" type="Object"/> 
+    <aura:attribute name="subscriptionResult" type="Object"/> 
+     <aura:attribute name="subscriptionResultTemp" type="Object"/> 
+    <aura:attribute name="orderData" type="Object"/> 
+    <aura:attribute name="showConfirmDialog" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doGetSubscriptionsFromEP}"/>
+    <aura:attribute name="options" type="List" default="[
+                                                        {'label': 'Breville', 'value': 'Breville'},
+                                                        {'label': 'Beanz', 'value': 'Beanz'}
+                                                        ]"/>
+    <aura:attribute name="brandOption" type="String" default="Breville"/>
+    <aura:html tag="style">
+        .slds-modal__container{ 
+        height: 101%;
+        width: 93%;
+        max-width: 420vh !important;
+        max-height: 300vh !important; 
+        } 
+        .modal-body{ 
+        height : 200vh !important; 
+        max-height: 800vh !important; 
+        } 
+        .slds-modal__footer{ 
+        display: inline !important; 
+        }
+    </aura:html>
+    <aura:if isTrue="{!v.showLoader}">
+        <c:LightningSpinnerUtilty/>
+    </aura:if>
+    <div class="slds-m-around_xx-medium">
+        <header class="slds-modal__header">
+            <h2 class="slds-text-heading_medium"><b>Subscriptions</b></h2>
+            <lightning:radioGroup name="radioGroup"
+                                  options="{! v.options }"
+                                  value="{! v.brandOption }"
+                                  type="radio"
+                                  onchange="{! c.doSelectBrand }"
+                                  />
+        </header>
+        <div class="slds-scrollable" style="height:12rem;">
+            <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal slds-p-horizontal_small slds-no-row-hover" role="grid">
+                <thead>
+                    <tr class="slds-text-title_caps" style="height: 37px;">
+                        <th class="slds-cell-shrink" scope="col"> 
+                            <div class="slds-truncate">
+                                <lightning:icon iconName="utility:rows" size="xx-small" alternativeText="Order ID" title="Order ID" />
+                            </div>
+                        </th>
+                        <th class="slds-cell-shrink" scope="col"> 
+                            <div class="slds-truncate" title="Id">Id</div>
+                        </th>
+                        <th class="slds-cell-shrink" scope="col">
+                            <div class="slds-truncate" title="Product">Product</div>
+                        </th>
+                        <th class="slds-cell-shrink" scope="col">
+                            <div class="slds-truncate" title="Description">Description</div>
+                        </th>
+                        <th class="slds-cell-shrink" scope="col">
+                            <div class="slds-truncate" title="Quantity">Quantity</div>
+                        </th>
+                        <th class="slds-cell-shrink" scope="col">
+                            <div class="slds-truncate" title="Frequency">Frequency</div>
+                        </th>
+                        <th class="slds-cell-shrink" scope="col">
+                            <div class="slds-truncate" title="Grand Total">Total</div>
+                        </th>
+                        <th class="slds-cell-shrink" scope="col">
+                            <div class="slds-truncate" title="Status">Status</div>
+                        </th>
+                        <th class="slds-cell-shrink" scope="col">
+                            <div class="slds-truncate" title="Discount">Discount</div>
+                        </th>
+                        <th class="slds-cell-shrink" scope="col">
+                            <div class="slds-truncate" title="Discount Type">Discount Type</div>
+                        </th>
+                        <th class="slds-cell-shrink" scope="col">
+                            <div class="slds-truncate" title="Next charge date">Next Charge Date</div>
+                        </th>
+                        <th class="slds-cell-shrink" scope="col">
+                            <div class="slds-truncate" title="Action">Action</div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:if isTrue="{!not(empty(v.data))}">
+                        <aura:iteration items="{!v.data}" var="subScriptionRec">                        
+                            <tr class="slds-hint-parent" style="{!if(subScriptionRec.id == v.highlightRow,'background: #391538;color:white;','')}">
+                                <td data-label="" scope="row">
+                                    <lightning:input type="radio" name="groupedAsOne" value="{!subScriptionRec.id}" onchange="{!c.doGetProductDetails}" />                  
+                                </td>
+                                <td data-label="Id"> 
+                                    <div class="slds-truncate" title="{!subScriptionRec.id}">{!subScriptionRec.id}</div>
+                                </td>
+                                <td data-label="skuCode">  
+                                    <div class="slds-truncate" title="{!subScriptionRec.skuCode}">{!subScriptionRec.skuCode}</div>
+                                </td>
+                                <td data-label="description">  
+                                    <div class="slds-truncate"  title="{!subScriptionRec.description}">{!subScriptionRec.description}</div>
+                                </td>
+                                <td data-label="quantity">  
+                                    <div class="slds-truncate" title="{!subScriptionRec.quantity}">{!subScriptionRec.quantity}</div>
+                                </td>
+                                <td data-label="frequency">  
+                                    <div class="slds-truncate" title="{!subScriptionRec.frequency}">{!subScriptionRec.frequency}</div>
+                                </td>
+                                <td data-label="totalAmount"> 
+                                    <div class="slds-truncate" title="{!subScriptionRec.totalAmount}">{!subScriptionRec.totalAmount}</div>
+                                </td>
+                                <td data-label="status"> 
+                                    <div class="slds-truncate" title="{!subScriptionRec.status}">{!subScriptionRec.status}</div>
+                                </td>
+                                
+                                <td data-label="status">  
+                                    <div class="slds-truncate" title="{!subScriptionRec.discountAmount}">{!subScriptionRec.discountAmount}</div>
+                                </td>
+                                <td data-label="status"> 
+                                    <div class="slds-truncate" title="{!subScriptionRec.discountAmount >0 ? subScriptionRec.discountType : ''}">{!subScriptionRec.discountAmount >0 ? subScriptionRec.discountType : ''}</div>
+                                </td>
+                                <td data-label="status"> 
+                                    <div class="slds-truncate" title="{!subScriptionRec.nextChargeDate}">{!subScriptionRec.nextChargeDate}</div>
+                                </td>
+                                <td data-label="Action"> 
+                                    <lightning:button variant="brand" label="Cancel" disabled="{!subScriptionRec.status != 'ACTIVE'}" value="{!subScriptionRec.id}" onclick="{! c.doCancelSubscription }" />
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </aura:if>
+                </tbody>
+            </table>
+            <aura:if isTrue="{!empty(v.data)}">                        
+                <div class="slds-align_absolute-center slds-box" style="height:4rem;font-size: larger;">{!v.Message}</div>
+            </aura:if>
+        </div>
+        <aura:if isTrue="{!v.showOrders}">
+            <header class="slds-modal__header">
+                <h2 class="slds-text-heading_medium"><b>Orders</b></h2>  
+            </header>
+            <div class="slds-scrollable" style="height:12rem;">
+                <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal slds-p-horizontal_small" role="grid">
+                    <thead>
+                        <tr class="slds-text-title_caps" style="height: 37px;">
+                            <th class="slds-cell-shrink" scope="col"> 
+                                <div class="slds-truncate" title="Order">Order</div>
+                            </th>
+                            <th class="slds-cell-shrink" scope="col">
+                                <div class="slds-truncate" title="Product">Product</div>
+                            </th>
+                            <th class="slds-cell-shrink" scope="col">
+                                <div class="slds-truncate" title="Description">Description</div>
+                            </th>
+                            <th class="slds-cell-shrink" scope="col">
+                                <div class="slds-truncate" title="Quantity">Quantity</div>
+                            </th>
+                            <th class="slds-cell-shrink" scope="col">
+                                <div class="slds-truncate" title="Grand Total">Total</div>
+                            </th> 
+                            <th class="slds-cell-shrink" scope="col">
+                                <div class="slds-truncate" title="Discount">Discount</div>
+                            </th>
+                            <!--
+                            <th class="slds-cell-shrink" scope="col">
+                                <div class="slds-truncate" title="Promocode">Promocode</div>
+                            </th>
+       -->
+                            <th class="slds-cell-shrink" scope="col">
+                                <div class="slds-truncate" title="Iteration">Iteration</div>
+                            </th>
+                            <th class="slds-cell-shrink" scope="col">
+                                <div class="slds-truncate" title="Tracking Link">Tracking Link</div>
+                            </th> 
+                            <th class="slds-cell-shrink" scope="col">
+                                <div class="slds-truncate" title="Type">Type</div>
+                            </th>
+                            <th class="slds-cell-shrink" scope="col">
+                                <div class="slds-truncate" title="Frequency">Frequency</div>
+                            </th>
+                        </tr> 
+                    </thead>
+                    <tbody>
+                        <aura:if isTrue="{!not(empty(v.orderData))}">
+                            <aura:iteration items="{!v.orderData}" var="orderRec">                        
+                                <tr class="slds-hint-parent">
+                                    
+                                    <td data-label="Order"> 
+                                        <a onclick="{!c.doNavigateToOrder}" data-attriVal="{!orderRec.OrderId}">{!orderRec.OrderNumber}</a>
+                                    </td>
+                                    <td data-label="Product">  
+                                        <div class="slds-truncate" title="{!orderRec.Product}">{!orderRec.Product}</div>
+                                    </td>
+                                    <td data-label="Description">  
+                                        <div class="slds-truncate" title="{!orderRec.Description}">{!orderRec.Description}</div>
+                                    </td>
+                                    <td data-label="Quantity">  
+                                        <div class="slds-truncate" title="{!orderRec.Quantity}">{!orderRec.Quantity}</div>
+                                    </td>
+                                    <td data-label="Total"> 
+                                        <div class="slds-truncate" title="{!orderRec.Total}">{!orderRec.Total}</div>
+                                    </td>
+                                    <td data-label="Discount"> 
+                                        <div class="slds-truncate" title="{!orderRec.Discount}">{!orderRec.Discount}</div>
+                                    </td>
+                                    <!--
+                                     <td data-label="Promocode"> 
+                                        <div class="slds-truncate" title="{!orderRec.Promocode}">{!orderRec.Promocode}</div>
+                                    </td>
+         -->
+                                    <td data-label="Iteration"> 
+                                        <div class="slds-truncate" title="{!orderRec.Iteration}">{!orderRec.Iteration}</div>
+                                    </td>
+                                    <td data-label="TrackingNumber"> 
+                                        <a onclick="{!c.doNavigateToTrackingLink}" target="_blank" data-attriVal="{!orderRec.TrackingLink}">{!orderRec.TrackingNumber}</a>
+                                    </td>
+                                    <td data-label="Type"> 
+                                        <div class="slds-truncate" title="{!orderRec.Type}">{!orderRec.Type}</div>
+                                    </td>
+                                    <td data-label="frequency"> 
+                                        <div class="slds-truncate" title="{!orderRec.frequency}">{!orderRec.frequency}</div>
+                                    </td>
+                                </tr> 
+                            </aura:iteration>
+                        </aura:if>
+                    </tbody>
+                </table>
+                <aura:if isTrue="{!empty(v.orderData)}">                        
+                    <div class="slds-align_absolute-center slds-box" style="height:4rem;font-size: larger;">No order records to display</div>
+                </aura:if>
+            </div>
+        </aura:if>
+    </div>
+</aura:component>

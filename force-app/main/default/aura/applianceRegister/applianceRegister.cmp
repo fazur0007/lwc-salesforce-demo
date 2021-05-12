@@ -1,0 +1,852 @@
+<aura:component controller="ProductRegistrationLightningController" implements="flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId" access="global" >
+    <!-- attribute for tooltip for PDC and DOB -->
+    <aura:attribute name="tooltipForPDC" type="boolean" default="false" />
+    <aura:attribute name="tooltipForDOB" type="boolean" default="false" />
+    <!-- attribute for pickList selected value  -->
+    <aura:attribute name="selectedValueForProduct" type="String" default=""/>
+    <aura:attribute name="selectedValueForModel" type="String" default=""/>
+    <aura:attribute name="selectedValueForGift" type="String" default=""/>
+    <!-- attribute for Products and Models -->
+    <aura:attribute name="productsList" type="Product2[]"/>
+    <aura:attribute name="models" type="Product2[]"/>
+    <aura:attribute name="placeOfPurchaseList" type="List" default="[]"   />
+    <!-- attribute for toggle the components -->
+    <aura:attribute name="flag" type="boolean" default="true"/>
+    <!-- 'showLoadingSpinner' attribute for show/hide the uploading image and msg in aura:if-->
+    <aura:attribute name="showLoadingSpinner" type="boolean" default="false" />
+    <!-- 'fileName' attribute for display the selected file name -->  
+    <aura:attribute name="fileName" type="String"   />
+    <aura:attribute name="firstName" type="String" default = "" access="public"/>
+    <aura:attribute name="lastName" type="String"  default = "" access="public"/>
+    <aura:attribute name="showAccountAsset" type="Boolean" default="true" /> 
+    <aura:attribute name="captchaVerify" type="Boolean" default="false" /> 
+    <aura:attribute name="saveInAsset" type="Asset"  default="{
+                                                              'sobjectType' : 'Asset',
+                                                              'Warranty_Product_Sub_Category__c': '',
+                                                              'Product2Id': '',
+                                                              'Where_did_you_purchase__c': '',
+                                                              'PurchaseDate': '',
+                                                              'attachment': '',
+                                                              'Batch_Code__c': '',
+                                                              'SerialNumber' : ''
+                                                              
+                                                              }"/>
+    <aura:attribute name="newAccount" type="Account"  default="{ 
+                                                               'sobjectType': 'Account',
+                                                               'FirstName': '',
+                                                               'LastName': '',
+                                                               'PersonBirthdate':'',
+                                                               'PersonEmail':''
+                                                               }"/>
+    <aura:attribute name="isProductDetails" type="boolean" default="true"/>
+    <aura:attribute name="isDeliveryDetails" type="boolean" default="false"/>
+    <aura:attribute name="isSummaryRegistration" type="boolean" default="false"/>
+    <aura:attribute name="isThankYou" type="boolean" default="false"/>
+    <aura:attribute name="saveInAccount" type="Account"/>
+    <aura:attribute name="fieldMap" type="Map"/>
+    <aura:attribute name="stateFieldMap" type="Map"/>
+    <aura:attribute name="listControllingValues" type="list" default="[]" description="to store controller field values"/>
+    <aura:attribute name="listDependingValues" type="list" default="['--- None ---']" description="to store dependent field values"/>
+    <aura:attribute name="depnedentFieldMap" type="map" description="map to store dependent values with controlling value"/>
+    <aura:attribute name="bDisabledDependentFld" type="boolean" default="true"/> 
+    <aura:attribute name="street" type="String" default=""/>
+    <aura:attribute name="city" type="String" default=""/>
+    <aura:attribute name="province" type="String" default="CA"/>
+    <aura:attribute name="country" type="String" default="US"/>
+    <aura:attribute name="postalCode" type="String" default=""/>
+    <aura:attribute name="provinceOptions" type="List" default="[]"/>
+    <aura:attribute name="countryOptions" type="List" default="[]"/>
+    <aura:attribute name="previousCountry" type="String"/>
+    <aura:attribute name="isActive" type="Boolean" default="false" required="true" />
+    <aura:attribute name="ProductFlag" type="boolean" default="true"/>
+    <aura:attribute name="accountId" type="String" />
+    <aura:attribute name="assetId" type="String" />
+    <aura:attribute name="accountRecord" type="Account" />
+    <aura:attribute name="assetRecord" type="Asset" />
+    <aura:attribute name="receiptURL" type="String" />
+    <aura:attribute name="receiptName" type="String" />
+    <aura:attribute name="modelName" type="String" />
+    <aura:attribute name="productName" type="String" />
+    <aura:attribute name="isLoad" type="Boolean" default="false" />
+    <aura:attribute access="public" name="accept" type="List" default="['.jpg', '.jpeg', '.pdf', '.gif','.png']"/>
+    <aura:attribute access="public" name="uploadedFiles" type="List" default=""/>
+    <aura:attribute access="public" name="sObjectAttachedFiles" type="List" default="[]"/>
+    <aura:attribute access="public" name="sObjectName" type="String" default=""/>
+    <aura:attribute access="public" name="sObjectId" type="String" default=""/>
+    <aura:attribute type="Boolean" name="showLoader" default="false"/>
+    <aura:attribute access="public" name="uploadedFileId" type="Id" />
+    <aura:attribute access="public" name="uploadedFileName" type="String" default="" />
+    
+    <aura:attribute name="objDetail" type="Case" default="{'sobjectType' : 'Case'}"/>
+    <aura:attribute name="controllingFieldAPI" type="string" default="Country__c" description="store field API name of Controller field"/>
+    <aura:attribute name="dependingFieldAPI" type="string" default="Purchased_From__c" description="store field API name of dependent field"/>
+    
+    <aura:attribute name="Recid" type="string"/>
+    <!--Popup related stuff -->
+    <aura:attribute name="openModal" type="boolean" default="false"/>
+    <!--Popup related stuff close -->
+    <aura:attribute name="parentId" type="Id"/>
+    <aura:attribute name="intLastStep" type="Integer" default="4" />
+    <aura:attribute name="intCurrentStep" type="Integer" default="2" />
+    <aura:attribute name="recaptchaResponse" type="String" />
+    <aura:attribute name="filetype" type="List" default="['.png', '.jpg', '.jpeg']" />
+    <aura:attribute name="listGiftProducts" type="List" access="public"/>
+    <aura:attribute name="showGift" type="Boolean" access="public" default="false"/>
+    
+    <aura:attribute name="selectedCountry" type="String"/>
+    <aura:attribute name="selectedState" type="String"/>
+    <aura:attribute name="objectAPIName" type="String" default="Account"/>
+    <aura:attribute name="countryPicklistAPIName" type="String" default="ShippingCountryCode"/>
+    <aura:attribute name="statePicklistAPIName" type="String" default="ShippingStateCode"/>
+    <aura:attribute name="options" type="List" access="private" description="The picklist options to choose from. Populated during component initialization."/>
+    <aura:attribute Name="selRecType" type="String"  access="public" />
+    <aura:attribute name="states" type="List" />
+    <aura:attribute name="hideCountry" type="string" default="false"/>
+    <aura:attribute name="hideState" type="string" default="false"/> 
+    <aura:attribute name="hideCaptcha" type="string" default="false"/> 
+    <aura:attribute name="hideSubProduct" type="string" default="false"/>
+    <aura:attribute name="hideModel" type="string" default="false"/> 
+    <aura:attribute name="hidePlaceOfPurchase" type="string" default="false"/>
+    <aura:attribute name="hideChooseGift" type="boolean" default="false"/>
+    <aura:attribute name="hideBirthDate" type="boolean" default="false"/>
+    <aura:attribute name="hideDateOfPurchase" type="boolean" default="false"/>
+    <aura:attribute name="dateValidationError" type="boolean" />
+    <aura:attribute name="dateValidationErrorForDOB" type="boolean" />
+    <aura:attribute name="dateValidationErrorPast" type="boolean" />
+    <aura:attribute name="dateValidationErrorForDOBPast" type="boolean" />
+    <aura:attribute name="isFileUploaded" type="boolean" />
+    
+    <aura:attribute name="fileNameJs" type="string" />
+    <aura:attribute name="fileTypeJs" type="string" /> 
+    <aura:attribute name="fileContentJs" type="string" />
+    <aura:attribute name="billingStateValue" type="string" default="false"/>
+    <aura:attribute name="billingCountryValue" type="string" default="false"/>
+    <aura:attribute name="backToBrevilleUrl" type="string" default="{!$Label.c.Back_to_Breville_home}"/>
+    <aura:attribute name="assetGiftCode" type="string" />
+    <aura:attribute name="isOfferCodeApplied" type="boolean" default="false"/>
+    <aura:attribute name="isDuplicateAsset" type="boolean" default="false"/>
+    <aura:attribute name="selectedGift" type="string" />
+    <aura:attribute name="isAccountCompleted" type="boolean" default="true"/>
+    <aura:attribute name="isYourPurchaseCompleted" type="boolean" default="false"/>
+    <aura:attribute name="isYourDeliveryCompleted" type="boolean" default="false"/>
+	<aura:attribute name="offerCode" type="string" default="AustraliaMothersDay"/>
+    <aura:attribute name="disableCountryField" type="Boolean" default="false" />
+    <!-- init handler -->
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    <aura:handler name="render" value="{!this}" action="{!c.onRender}" />
+  
+    <div role="main" style="box-sizing: border-box;font-size: 14px;color: rgb(3, 3, 3);box-sizing: border-box;width: 155.7px !important;max-width: 45% !important;height: 36px;vertical-align: middle;border: 0;text-align: left !important;font-family: CircularStd-Medium;font-size: 14px;color: rgb(3, 3, 3);line-height: 1.5;">
+        <img alt="{!$Label.c.Breville_Logo_Alt_text}" src="{!$Resource.BrevilleLogo}"></img>
+    </div>
+    <br />
+    <h1 class="Register-your-product slds_responsive">{!$Label.c.Register_your_product}</h1>    
+     <div class="slds_responsive">
+        <div style="slds-box slds-align_absolute-left text-align:center" class="slds_responsive">
+            <div class="circle-parent">
+                <span class="circle cicrle-top-padding" aura:id="circle1">
+                    <aura:if isTrue="{!lessthanorequal(v.intCurrentStep, 1)}">
+                        <div class="cicrle-top-padding-step slds-align_absolute-center Progress-indicator-font" style="padding-left: 11px !important;">1</div>
+                        <aura:set attribute="else">
+                            <div class="cicrle-top-padding-step Progress-indicator-font completedStep" style="padding-left: 1px !important;">1</div>
+                        </aura:set>
+                    </aura:if>
+                </span>
+                <span class="stepLabel Progress-indicator-font slds_responsive sfdc_text_size_responsive sfdc_process_line_padding" aura:id="label1">{!$Label.c.Account}</span>
+            </div>
+            <span class="completedLine line" aura:id="line1"></span> 
+            <div class="circle-parent">
+                <span class="circle inactiveStep" aura:id="circle2">
+                    <aura:if isTrue="{!lessthanorequal(v.intCurrentStep, 2)}">
+                        <div class="cicrle-top-padding-step slds-align_absolute-center Progress-indicator-font">2</div>
+                        <aura:set attribute="else">
+                            <div class="cicrle-top-padding-step Progress-indicator-font" data-id ="2" onclick="{!c.getStageId}">2</div>
+                        </aura:set>
+                    </aura:if>
+                </span>
+                <span class="stepLabel Progress-indicator-font slds_responsive sfdc_text_size_responsive sfdc_text_process_indicator_responsive sfdc_process_line_padding" aura:id="label2">{!$Label.c.Your_Purchase}</span>
+            </div>
+            <aura:if isTrue="{!greaterthanorequal(v.intCurrentStep, 3)}">
+                <span class="completedLine line" aura:id="line2"></span>    
+                <aura:set attribute="else">
+                    <span class="line" aura:id="line2"></span>
+                </aura:set>
+            </aura:if>
+            
+            <div class="circle-parent">
+                <span class="circle inactiveStep" aura:id="circle3">
+                    <aura:if isTrue="{!lessthanorequal(v.intCurrentStep, 3)}">
+                        <div class="cicrle-top-padding-step slds-align_absolute-center Progress-indicator-font" data-id ="3" onclick="{!c.getStageId}">3</div>
+                        <aura:set attribute="else">
+                            <div class="Progress-indicator-font cicrle-top-padding-step" data-id ="3" onclick="{!c.getStageId}">3</div>
+                        </aura:set>
+                    </aura:if>
+                </span>
+                <span class="stepLabel Progress-indicator-font slds_responsive sfdc_text_size_responsive sfdc_text_process_indicator_responsive sfdc_process_line_padding" aura:id="label3">{!$Label.c.Your_Delivery}</span>
+            </div>
+            <aura:if isTrue="{!greaterthanorequal(v.intCurrentStep, 4)}">
+                <span class="completedLine line" aura:id="line3"></span>    
+                <aura:set attribute="else">
+                    <span class="line" aura:id="line3"></span>
+                </aura:set>
+            </aura:if>
+            <div class="circle-parent">
+                <span class="circle inactiveStep" aura:id="circle4">
+                    <aura:if isTrue="{!lessthanorequal(v.intCurrentStep, 4)}">
+                        <div class="cicrle-top-padding-step slds-align_absolute-center Progress-indicator-font" data-id ="4"  onclick="{!c.getStageId}">4</div>
+                        <aura:set attribute="else">
+                            <div class="cicrle-top-padding-step Progress-indicator-font" data-id ="4"  onclick="{!c.getStageId}">4</div>
+                        </aura:set>
+                    </aura:if>
+                </span>
+                <span class="stepLabel Progress-indicator-font slds_responsive sfdc_text_size_responsive sfdc_process_line_padding" aura:id="label4">{!$Label.c.Review}</span>
+            </div>
+        </div>        
+    </div>
+    <br/>  
+    <aura:if isTrue="{!v.openModal}">
+        <div role="dialog" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header slds-modal__header_empty">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" style="border: 1px solid whitesmoke;" title="Close" onclick="{!c.handleCloseModal}">X<span class="slds-assistive-text">Close</span></button>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <img id="myimage" src="{!$Resource.BatchCodeImage}"/>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>          
+    </aura:if>    
+    <aura:if isTrue = "{!v.isProductDetails}">
+        <div class="PageHeader slds_responsive">{!$Label.c.Your_Purchase}</div>
+        <br></br>
+        
+        <div class="slds-float_left slds_responsive " >
+            <!-- Calling productDetails Component   -->
+            <div class="HomeText  slds_responsive ">{!$Label.c.Your_Purchase_Welcome_Text}</div>
+            <br/>
+            <div class="HomeText slds_responsive ">{!$Label.c.Mandatory_text}</div>
+            <br/>
+            <div class="slds-grid   slds_responsive">
+                <div class="slds-col slds-size_2-of-4 ">
+                    
+                    <lightning:input class="noAsterisk font_family custom-heading_color right_padding_firstname" 
+                                     aura:id="formFieldToValidate" 
+                                     label="{!$Label.c.First_name_PDPage}"
+                                     placeholder="{!$Label.c.First_name_placeholder_PDPage}" 
+                                     value="{!v.newAccount.FirstName}"
+                                     messageWhenValueMissing="{!$Label.c.Mandatory_field_error_PDPage}" 
+                                     required="true"
+                                     type="text"
+                                     maxlength="40"
+                                     /> 
+                    
+                </div>                
+                
+                <div class=" slds-size_2-of-4 NoRightPadding ">
+                    <lightning:input class="noAsterisk font_family custom-heading_color left_padding_lastname" 
+                                     label="{!$Label.c.Last_name_PDPage}"
+                                     aura:id="formFieldToValidate" 
+                                     placeholder="{!$Label.c.Last_name_placeholder_PDPage}" 
+                                     value="{!v.newAccount.LastName}"
+                                     messageWhenValueMissing="{!$Label.c.Mandatory_field_error_PDPage}" 
+                                     required="true"
+                                     type="text"
+                                     maxlength="80"
+                                     /> 
+                </div> 
+            </div>  
+
+            <div class="slds-grid slds-gutters slds_responsive sfdc_input_box_div sfdc_right_margin">
+                <div class="slds-col slds-size_3-of-4" style="display:flex">
+                    <div>
+                        <label class="slds-form-element__label font_family labelwithTopMargin" aria-label="dobId">
+                            <abbr class="slds-required" > </abbr>{!$Label.c.Birthdate_PDPage}
+                        </label>
+                    </div>
+                    <!--<lightning:icon iconName="utility:info" size="xx-small" alternativeText="large size" title="large size"/>-->
+                    <div id="dobId" class="dobicon">
+                    	<lightning:helptext content="{!$Label.c.Birthday_help_text}" />
+                    </div> 
+                </div>
+                <div class="slds-col slds-size_1-of-4">
+                </div> 
+            </div> 
+            <!--<div class="sfdc_tool_tip_bottom ">  -->
+            <div>  
+                <span>
+
+                    <div class="slds-form-element sfdc_input_box_div slds_responsive" aura:id="enableDOBError">
+                        
+                        <lightning:input type="date" 
+                                         class="noAsterisk sfdc_input_box_div font_family sfdc_right_margin slds_responsive smallLineheight"
+                                         aura:id="dobId" 
+                                         placeholder="{!$Label.c.Date_place_holder_PDPage}"
+                                         name="dateValidationErrorForDOB" 
+                                         value="{!v.newAccount.PersonBirthdate}"
+                                         onchange="{!c.validateDateForDOB}"
+                                         />
+                        
+                    </div>
+                    <aura:if isTrue="{!v.hideBirthDate}"> 
+                        <div aura:id="changeIt" style="color:rgb(194, 57, 52)">{!$Label.c.Mandatory_field_error_PDPage}</div>
+                    </aura:if> 
+                    <aura:if isTrue="{!v.dateValidationErrorForDOBPast}">
+                        <div class="slds-text-color_error slds-p-left_x-small">
+                            {!$Label.c.Date_field_error_message_PDPage}
+                        </div>
+                    </aura:if> 
+                </span>
+            </div>  
+            
+
+            <!-- *********Product Details Starts***************** -->
+            
+            <div class="slds-form-element sfdc_input_box_div slds_responsive" aura:id="enableSubProductError">
+                <div >
+                    <lightning:select class="slds-m-left_none  font_family sfdc_right_margin noAsterisk labelwithTopMargin" 
+                                      aura:id="selectedSubProductId" 
+                                      onchange="{!c.handleOptionSelectedForProduct}"   
+                                      label="{!$Label.c.Product_Type_PDPage}" 
+                                      value="{!v.saveInAsset.Warranty_Product_Sub_Category__c}" 
+                                      >
+                        <option value="">{!$Label.c.Default_Picklist_Value}</option> 
+                        <aura:iteration items="{!v.productsList}" var="item">
+                            <option value="{!item.Id}">{!item.value}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+                <aura:if isTrue="{!v.hideSubProduct}"> 
+                    <div aura:id="changeIt" style="color:rgb(194, 57, 52)">{!$Label.c.Select_field_error_message_PDPage}</div>
+                </aura:if>   
+            </div>
+            
+
+            <div class="slds-form-element sfdc_input_box_div slds_responsive" aura:id="enableModelError">
+                <div >
+                    <lightning:select class="slds-m-left_none  font_family sfdc_right_margin noAsterisk labelwithTopMargin"
+                                      aura:id="selectedModelId"
+                                      
+                                      onchange="{!c.handleOptionSelectedForModel}" 
+                                      label="{!$Label.c.Purchase_Model_PDPage}" 
+                                      value="{!v.saveInAsset.Product2Id}" 
+                                      >
+                        
+                        <option value="">{!$Label.c.Default_Picklist_Value}</option>
+                        <aura:iteration items="{!v.models}" var="model">
+                            <option value="{!model.value}" >{!model.label}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+                
+                <aura:if isTrue="{!v.hideModel}"> 
+                    <div aura:id="changeIt" style="color:rgb(194, 57, 52)">{!$Label.c.Select_field_error_message_PDPage}</div>
+                </aura:if>   
+            </div>
+
+            <!-- *********Product Details Ends****************** -->
+            <div class="slds-form-element sfdc_input_box_div slds_responsive" aura:id="enablePlaceOfPurchaseError">
+                <div >
+                    <lightning:select class="slds-m-left_none  font_family sfdc_right_margin noAsterisk labelwithTopMargin" 
+                                      aura:id="placeOfPurchaseId" 
+                                      onchange="{!c.placeOfPurchase}" 
+                                      label="{!$Label.c.Place_of_purchase_PDPage}"
+                                      value="{!v.saveInAsset.Where_did_you_purchase__c}"  
+                                      >
+                        
+                        <option value="">{!$Label.c.Default_Picklist_Value}</option>
+                        
+                        <aura:iteration items="{!v.placeOfPurchaseList}" var="Items">
+                            <option value="{!Items.Id}">{!Items}</option>
+                        </aura:iteration>
+                        
+                    </lightning:select>
+                </div>
+                <aura:if isTrue="{!v.hidePlaceOfPurchase}"> 
+                    <div aura:id="changeIt" style="color:rgb(194, 57, 52)">{!$Label.c.Select_field_error_message_PDPage}</div>
+                </aura:if>   
+            </div>
+
+            <div >
+                <div class="slds-form-element sfdc_input_box_div slds_responsive" aura:id="enableDateOfPurchaseError">
+                    
+                    
+                    <lightning:input type="date"
+                                     class="noAsterisk sfdc_input_box_div font_family sfdc_right_margin slds_responsive labelwithTopMargin"
+                                     aura:id="dateOfPurchaseId"
+                                     placeholder="{!$Label.c.Date_place_holder_PDPage}"
+                                     name="DateOfPurchase" 
+                                     label="{!$Label.c.Date_of_purchase_PDPage}" 
+                                     value="{!v.saveInAsset.PurchaseDate}"
+                                     onchange="{!c.validateDateOfPurchase}"
+                                     />
+                </div>
+                <aura:if isTrue="{!v.hideDateOfPurchase}"> 
+                    <div aura:id="changeIt" style="color:rgb(194, 57, 52)">{!$Label.c.Mandatory_field_error_PDPage}</div>
+                </aura:if>
+                <aura:if isTrue="{!v.dateValidationErrorPast}">
+                    <div class="slds-text-color_error slds-p-left_x-small">
+                        {!$Label.c.Date_field_error_message_PDPage}
+                    </div>
+                </aura:if>  
+            </div>
+
+            
+            <!-- *********Input Fields End****************** -->
+            
+            <div class="noAsterisk sfdc_input_box_div font_family sfdc_right_margin slds_responsive labelwithTopMargin" >
+                <label class="slds-form-element__label font_family" for="">
+                    <abbr class="slds-required font_family" >
+                    </abbr>{!$Label.c.Upload_Image_PDPage} </label>
+            </div>            
+            <lightning:fileUpload class="noAsterisk font_family slds-show_inline-block zeroLineheight"
+                                  name="fileUploader"
+                                  aura:id="fileUploaderId"
+                                  messageWhenValueMissing="{!$Label.c.Mandatory_field_error_PDPage}" 
+                                  multiple="false"
+                                  accept="{!v.accept}"
+                                  disabled="false"
+                                  recordId=""
+                                  value="{!v.uploadedFiles}"    
+                                  onuploadfinished="{!c.handleUploadFinished1}"
+                                  />
+            <aura:if isTrue="{!not(empty(v.uploadedFileName))}">
+                <a>
+                    <lightning:pill class="slds-wrap slds-m-bottom_small slds_file_uploaded_text attchPills slds-show_inline-block slds-align_absolute-center" label="{!v.uploadedFileName}" name="{!v.uploadedFileId}" 
+                                    onclick="{!c.previewFile}" onremove="{!c.removeFile}">
+                    </lightning:pill>
+                </a>
+            </aura:if>
+            <aura:if isTrue ="{!v.isFileUploaded}">
+                <div class="slds-text-color_error slds-p-left_x-small">
+                    {!$Label.c.Mandatory_field_error_PDPage}
+                </div>
+            </aura:if>
+
+            <div class="slds-grid slds-gutters  sfdc_input_box_div slds_responsive">
+                
+                <div class="slds-col slds-size_3-of-4 sfdc_tool_tip_top_inner_div ">
+                    <label class="slds-form-element__label font_family labelwithTopMargin"  aria-label="pdcId">
+                        <abbr class="slds-required font_family" > </abbr>{!$Label.c.PDC_PDPage} </label>
+                </div>
+                <div id="pdcId" class="slds-col slds-size_1-of-4   sfdc_tool_tip_top_icon  ">
+                    
+                    <div id="popup" class="anchorStyle slds-float_right" style="margin-top:40px" onmouseover="{!c.doPopulateBatchCodeImage}">
+                        {!$Label.c.Tooltip_label_PDPage}
+                    </div>
+                </div> 
+            </div> 
+            <div class="sfdc_tool_tip_bottom slds_responsive"> 
+                    <lightning:input class="sfdc_input_box_div font_family sfdc_right_margin slds_responsive NoTopMargin zeroLineheight" 
+                                     aura:id="pdcId" 
+                                     placeholder="{!$Label.c.PDC_place_holder_PDPage}" 
+                                     name="PDC"
+                                     value="{!v.saveInAsset.Batch_Code__c}"
+                                     type="text"
+                                     maxlength="6"
+                                     /> 
+            </div>  
+
+            <!-- <div class="slds-grid slds-gutters  sfdc_input_box_div slds_responsive">
+                
+                <div class="slds-col slds-size_3-of-4 sfdc_tool_tip_top_inner_div ">
+                    <label class="slds-form-element__label font_family labelwithTopMargin" for="serialNumberId">
+                        <abbr class="slds-required font_family" > </abbr>{!$Label.c.Serial_number_PDPage}</label>
+                </div>
+               <div class="slds-col slds-size_1-of-4   sfdc_tool_tip_top_icon  ">
+                    
+                    <div id="popup" class="anchorStyle slds-float_right" onmouseover="{!c.doPopulateBatchCodeImage}">
+                        {!$Label.c.Tooltip_label_PDPage}
+                    </div>
+                </div>
+            </div>  -->
+            <div class="sfdc_tool_tip_bottom slds_responsive"> 
+
+                    <lightning:input class=" sfdc_input_box_div font_family sfdc_right_margin slds_responsive labelwithTopMargin"
+                                     aura:id="serialNumberId" 
+                                     name="Serial number"
+                                     placeholder="{!$Label.c.serialnumber_place_holder_PDPage}"
+                                     value="{!v.saveInAsset.SerialNumber}"
+                                     label="{!$Label.c.Serial_number_PDPage}"
+                                     required="false"
+                                     maxlength="80"
+                                     type="text"
+                                     />
+
+            </div>
+
+            
+            <aura:if isTrue = "{!v.showGift}">
+                <div class="slds-form-element sfdc_input_box_div slds_responsive" aura:id="enableChooseGiftError">  
+                    <lightning:select class="slds-m-left_none sfdc_input_box_div font_family sfdc_right_margin noAsterisk slds_responsive labelwithTopMargin"
+                                      aura:id="chooseYourGiftId"
+                                      onchange="{!c.chooseYourGift}" 
+                                      label="{!$Label.c.Choose_gift_label_PDPage}"
+                                      value="{!v.saveInAsset.Selected_Offer_Line_Item__c}" 
+                                      >
+                        <option value="">{!$Label.c.Default_Picklist_Value}</option>
+                        <aura:iteration items="{!v.listGiftProducts}" var="gift">
+                            <option value="{!gift.value}" >{!gift.label}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                    <aura:if isTrue="{!v.hideChooseGift}"> 
+                        <div aura:id="changeIt" style="color:rgb(194, 57, 52)">{!$Label.c.Select_field_error_message_PDPage}</div>
+                    </aura:if>
+                </div>
+            </aura:if>
+            <div class="slds-grid" >
+                <div class="slds-col slds-size_2-of-4 ">                   
+                    
+                </div>
+                
+                <div class="slds-col slds-size_2-of-4 ">
+                    <lightning:button class="sfdc_button_breville  slds-float_right  sfdc_button_fontsize__responsive sfdc_button_width_height" 
+                                      label="{!$Label.c.Next_button_label_PDPage}" 
+                                      onclick="{!c.goOnApplianceRegisterSummary}"/>
+                    
+                </div>
+            </div>
+        </div>    
+    </aura:if> 
+    
+    <aura:if isTrue = "{!v.isDeliveryDetails}">
+        <div class="PageHeader slds_responsive">{!$Label.c.Your_Delivery}</div>
+        <div class="slds-float_left slds_responsive">
+            
+            <div class="slds_responsive">
+                <!-- DeliveryDetail Component  -->
+                <br/>
+                <div class="HomeText sfdc_input_box_div">{!$Label.c.Provide_Delivery_Details}</div>
+                <br/>
+                <div class="HomeText sfdc_input_box_div">{!$Label.c.Mandatory_text}</div>
+                <br/>
+                
+                <!--     <div class="slds-p-around_large  slds-text-align_left"> -->
+                <!--   <div class="slds-box slds-align_absolute-left slds-box_xx-small slds-text-align_left "> -->
+                <div class="slds-grid  slds-gutters sfdc_input_box_div sfdc_right_margin">
+                    <div class="slds-col slds-size_2-of-4 ">
+                        <lightning:input class="font_family" aura:id="firstName" label="{!$Label.c.First_Name}" value="{!v.newAccount.FirstName}" readonly ="true"/>
+                    </div>
+                    <div class="slds-col slds-size_2-of-4">
+                        <lightning:input class="font_family" aura:id="lastName" label="{!$Label.c.Last_Name}" value="{!v.newAccount.LastName}" readonly ="true"/>
+                    </div>
+                </div>
+
+                <div class="slds-form-element sfdc_input_box_div">
+                    <div class="slds-form-element__control">
+                        <lightning:input class="font_family labelwithTopMargin" 
+                                         aura:id="PhoneId" 
+                                         label="{!$Label.c.PhoneV3}" 
+                                         value="{!v.newAccount.Phone}" 
+                                         onchange="{!c.removeValidation}" 
+                                         maxlength="40"
+                                         type="text"
+                                         pattern="[0-9]*"
+                                         messageWhenPatternMismatch="{!$Label.c.Numeric_value_error}"
+                                         />
+                    </div>
+                </div>
+
+                <div class="slds-form-element sfdc_input_box_div">
+                    <div class="slds-form-element__control">
+                        <lightning:input class="font_family labelwithTopMargin" aura:id="AddressLineId" label="{!$Label.c.AddressV1}" value="{!v.newAccount.ShippingStreet}" onchange="{!c.removeValidation}" maxlength="255"/>
+                    </div>
+                </div>
+
+                <div class="slds-form-element sfdc_input_box_div">
+                    <div class="slds-form-element__control">
+                        <lightning:input class="font_family labelwithTopMargin" aura:id="AddressLine2Id" label="{!$Label.c.AddressV2}" value="{!v.newAccount.Shipping_Street_Line_1__c}" maxlength="100"/>
+                    </div>
+                </div>
+
+               
+                <div class="slds-form-element sfdc_input_box_div">
+                    <div class="slds-form-element__control">
+                        <lightning:input class="font_family labelwithTopMargin" aura:id="BillingCityId" label="{!$Label.c.CityV1}" value="{!v.newAccount.ShippingCity}" onchange="{!c.removeValidation}" maxlength="40"/>
+                    </div>
+                </div>
+            
+                <div class="slds-grid  slds-gutters sfdc_input_box_div sfdc_right_margin">
+                    <div class="slds-col slds-size_2-of-4 ">
+                        <div class="slds-m-left_none" aura:id="enableStateError">
+                            <lightning:select aura:id="stateId" class="font_family labelwithTopMargin" name="state" value="{!v.newAccount.ShippingStateCode}"  label="{!$Label.c.StateV1}" onchange="{!c.changeState}">
+                                <option value="">-- None --</option>
+                                <aura:iteration items="{!v.states}" var="item">
+                                    <option value="{!item.value}" >{!item.label}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        <aura:if isTrue="{!v.hideState}"> 
+                            <div aura:id="changeIt" style="color:rgb(194, 57, 52)">{!$Label.c.Select_field_error_message_PDPage}</div>
+                        </aura:if>
+                    </div>
+                    <div class="slds-col slds-size_2-of-4">
+                        <div class="slds-form-element__control">
+                            <lightning:input class="font_family labelwithTopMargin" pattern="[0-9]*" aura:id="PostalCodeId" label="{!$Label.c.postalCodeV1}" value="{!v.newAccount.ShippingPostalCode}" onchange="{!c.removeValidation}" type="Text" maxlength="20" messageWhenPatternMismatch="{!$Label.c.Numeric_value_error}" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slds-form-element sfdc_input_box_div" aura:id="enableCountryError">
+                    <div class="slds-m-left_none">
+                        <lightning:select aura:id="CountryId" class="font_family labelwithTopMargin" name="countryName" label="{!$Label.c.CountryV1}" value="{!v.newAccount.ShippingCountryCode}" onchange="{!c.changeCountry}" disabled="{!v.disableCountryField}">
+                            <aura:iteration items="{!v.fieldMap}" var="item">
+                                <option value="{!item.key}">{!item.value}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </div>
+                    <aura:if isTrue="{!v.hideCountry}"> 
+                        <div aura:id="changeIt" style="color:rgb(194, 57, 52)">{!$Label.c.Select_field_error_message_PDPage}</div>
+                    </aura:if>   
+                </div>
+                
+                
+                <br></br>
+                <div class="slds-form-element sfdc_input_box_div sfdc_recaptcha_responsive labelwithTopMargin">
+                    <div id="recaptchaCheckbox"></div>
+                    <label for="g-recaptcha-response" style="display:none">captcha response</label>
+                    <br/>
+                    <aura:if isTrue="{!v.hideCaptcha}"> 
+                        <div aura:id="changeIt" style="color:rgb(194, 57, 52)">{!$Label.c.CaptchaLabel}</div>
+                    </aura:if>
+                </div>
+                
+                <div class="slds-grid" >
+                    <div class="slds-col slds-size_2-of-4 ">                   
+                        <lightning:button class="sfdc_button_breville slds-float_left sfdc_button_fontsize__responsive sfdc_button_width_height"
+                                          label="Back"
+                                          onclick="{! c.handleBackButton }"/>
+                    </div>
+                    
+                    <div class="slds-col slds-size_2-of-4 ">
+                        <lightning:button aura:id="myButton" class="sfdc_button_breville slds-float_right sfdc_button_fontsize__responsive sfdc_button_width_height" 
+                                          label="{!$Label.c.Next_button_label_PDPage}"
+                                          onclick="{!c.goRegistrationSummary}"  />
+                        
+                    </div>
+                </div>
+            </div>   
+        </div>
+        
+    </aura:if>  
+    <aura:if isTrue = "{!v.isSummaryRegistration}">
+        <div class="PageHeader slds_responsive">{!$Label.c.Review}</div>
+        <br/>
+        <div class="slds-float_left slds_responsive">
+            <hr class="Summary_hr_tag"></hr>
+            <div class="slds-grid  slds-gutters  slds_responsive slds-p-bottom_x-large">
+                <div class="slds-col slds-size_2-of-4 font_family_bold slds-form-element__label">
+                    {!$Label.c.YourPurchase}
+                </div>
+                <div class="slds-col slds-size_2-of-4">
+                    <!--<a onclick = "{!c.purchaseEdit}" class="slds-file-selector__button" >{!$Label.c.Edit}</a>-->
+                    <lightning:button label="{!$Label.c.Edit}" 
+                                      class="slds-edit-selector__button" 
+                                      onclick = "{!c.purchaseEdit}" />
+                </div>
+            </div>
+            
+            <div class="slds-grid  slds-gutters  slds_responsive">
+                <div class="slds-col slds-size_2-of-4 font_family PaddingDown">
+                    {!$Label.c.Product_label_PDPage}:
+                </div>
+                <div class="slds-col slds-size_2-of-4 slds-form-element__label PaddingDown">
+                    {!v.saveInAsset.Warranty_Product_Sub_Category__c}
+                </div>
+            </div>
+            
+            <div class="slds-grid  slds-gutters  slds_responsive">
+                <div class="slds-col slds-size_2-of-4 font_family PaddingDown">
+                    {!$Label.c.Model}:
+                </div>
+                <div class="slds-col slds-form-element__label slds-size_2-of-4 PaddingDown">
+                    {!v.productName}
+                </div>
+            </div>
+            
+            <div class="slds-grid  slds-gutters  slds_responsive">
+                <div class="slds-col slds-size_2-of-4 font_family PaddingDown">
+                    {!$Label.c.Serial_number_PDPage}:
+                </div>
+                <div class="slds-col slds-size_2-of-4 slds-form-element__label PaddingDown">
+                    {!v.saveInAsset.SerialNumber}
+                </div>
+            </div>
+            
+            <div class="slds-grid  slds-gutters  slds_responsive">
+                <div class="slds-col slds-size_2-of-4 font_family PaddingDown">
+                    {!$Label.c.DateofPurchase}:
+                </div>
+                <div class="slds-col slds-size_2-of-4 slds-form-element__label PaddingDown">
+                    {!v.saveInAsset.PurchaseDate}
+                </div>
+            </div>
+            
+            <div class="slds-grid  slds-gutters  slds_responsive slds-p-bottom_medium">
+                <div class="slds-col slds-size_2-of-4 font_family">
+                    {!$Label.c.Receipt}:
+                </div>
+                <div class="slds-col slds-size_2-of-4">
+                    <aura:if isTrue="{!not(empty(v.uploadedFileName))}">
+                        <a>
+                            <lightning:pill class="slds-wrap slds-m-bottom_small attchPills slds-show_inline-block slds-align_absolute-center slds_file_uploaded_text_summary_page summary-pill slds-pill__remove" label="{!v.uploadedFileName}" name="{!v.uploadedFileId}" 
+                                            onclick="{!c.previewFile}">                            
+                            </lightning:pill>
+                        </a>
+                    </aura:if>
+                </div>
+            </div>
+            <aura:if isTrue = "{!v.showGift}">
+                 <div class="slds-grid  slds-gutters  slds_responsive">
+                    <div class="slds-col slds-size_2-of-4 font_family PaddingDown">
+                        {!$Label.c.Product_Registration_Gift}:
+                    </div>
+                    <div class="slds-col slds-size_2-of-4 slds-form-element__label PaddingDown">
+                        {!v.selectedGift}
+                    </div>
+                </div>
+            </aura:if>
+            <hr class="Summary_hr_tag"></hr>
+            <div class="slds-grid  slds-gutters  slds_responsive slds-p-bottom_x-large">
+                <div class="slds-col slds-size_2-of-4 font_family_bold slds-form-element__label">
+                    {!$Label.c.YourDelivery}
+                </div>
+                <div class="slds-col slds-size_2-of-4">
+                    <!--<a onclick = "{!c.deliveryEdit}" class="sfdc_summary_edit_button" >{!$Label.c.Edit}</a>-->
+                    <lightning:button label="{!$Label.c.Edit}" 
+                                      class="slds-edit-selector__button" 
+                                      onclick = "{!c.deliveryEdit}" />
+                </div>
+            </div>
+            
+            <div class="slds-grid  slds-gutters  slds_responsive">
+                <div class="slds-col slds-size_2-of-4 font_family PaddingDown">
+                    {!$Label.c.Name}:
+                </div>
+                <div class="slds-col slds-size_2-of-4 slds-form-element__label PaddingDown">
+                    {!v.newAccount.FirstName}
+                </div>
+            </div>
+            
+            <div class="slds-grid  slds-gutters  slds_responsive">
+                <div class="slds-col slds-size_2-of-4 font_family PaddingDown">
+                    {!$Label.c.Phone}:
+                </div>
+                <div class="slds-col slds-size_2-of-4 slds-form-element__label PaddingDown">
+                    {!v.newAccount.Phone}
+                </div>
+            </div>
+            
+            <div class="slds-grid  slds-gutters  slds_responsive">
+                <div class="slds-col slds-size_2-of-4 font_family PaddingDown">
+                    {!$Label.c.Addressline1}:
+                </div>
+                <div class="slds-col slds-size_2-of-4 slds-form-element__label PaddingDown">
+                    {!v.newAccount.ShippingStreet}
+                </div>
+            </div>
+            
+            <div class="slds-grid  slds-gutters  slds_responsive">
+                <div class="slds-col slds-size_2-of-4 font_family PaddingDown">
+                    {!$Label.c.Addressline2}:
+                </div>
+                <div class="slds-col slds-size_2-of-4 slds-form-element__label PaddingDown">
+                    {!v.newAccount.Shipping_Street_Line_1__c}
+                </div>
+            </div>
+            
+            <div class="slds-grid  slds-gutters  slds_responsive">
+                <div class="slds-col slds-size_2-of-4 font_family PaddingDown">
+                    {!$Label.c.ProRegCity}:
+                </div>
+                <div class="slds-col slds-size_2-of-4 slds-form-element__label PaddingDown">
+                    {!v.newAccount.ShippingCity}
+                </div>
+            </div>
+            
+            <div class="slds-grid  slds-gutters  slds_responsive">
+                <div class="slds-col slds-size_2-of-4 font_family PaddingDown">
+                    {!$Label.c.State}:
+                </div>
+                <div class="slds-col slds-size_2-of-4 slds-form-element__label PaddingDown">
+                    {!v.billingStateValue}
+                </div>
+            </div>
+            
+            <div class="slds-grid  slds-gutters  slds_responsive">
+                <div class="slds-col slds-size_2-of-4 font_family PaddingDown">
+                    {!$Label.c.ProRegPostalCode}:
+                </div>
+                <div class="slds-col slds-size_2-of-4 slds-form-element__label PaddingDown">
+                    {!v.newAccount.ShippingPostalCode}
+                </div>
+            </div>
+            
+            <div class="slds-grid  slds-gutters  slds_responsive">
+                <div class="slds-col slds-size_2-of-4 font_family">
+                    {!$Label.c.Country}:
+                </div>
+                <div class="slds-col slds-size_2-of-4 slds-form-element__label">
+                    {!v.billingCountryValue}
+                </div>
+            </div>
+            <hr class="Summary_hr_tag"></hr>
+            <!--<div class="slds-grid" >
+                <div class="slds-size_1-of-4 PaddingDown">                   
+                    <lightning:button label="{!$Label.c.Back}" 
+                                      class="sfdc_button_breville slds-float_left sfdc_button_width_height_summary_page_back" 
+                                      onclick = "{!c.back}" />
+                </div>
+                <div class="slds-col slds-size_3-of-4 PaddingDown">
+                    <lightning:button label="{!$Label.c.submitRegistration}"
+                                      class="sfdc_big_button_breville slds-float_right sfdc_big_button_width_height " 
+                                      onclick = "{!c.submitClaimJs}"/>
+                </div>
+            </div> -->
+            <div class="slds-grid" style="width:100%;display: inline-block;" >
+                <div class="slds-float_left">                   
+                    <lightning:button label="{!$Label.c.Back}" 
+                                      class="sfdc_button_breville slds-float_left sfdc_button_width_height_summary_page_back" 
+                                      onclick = "{!c.back}" />
+                </div>
+                <div class="slds-float_right">
+                    <lightning:button label="{!$Label.c.submitRegistration}"
+                                      class="sfdc_big_button_breville slds-float_right sfdc_big_button_width_height" 
+                                      onclick = "{!c.submitClaimJs}"/>
+                </div>
+            </div>
+            
+        </div>
+    </aura:if> 
+    <aura:if isTrue = "{!v.isThankYou}">
+        <div class="PageHeader slds_responsive">{!$Label.c.Summery_Page_Thank_You}</div>
+        <br/>
+        <br/>
+        <div class="slds-float_left slds_responsive">
+            <div class="slds-grid  slds-gutters  slds_responsive slds-p-bottom_x-large">
+                <p class="slds-p-horizontal_small">                   
+                    <aura:if isTrue="{!v.isOfferCodeApplied}">                       
+                        <p class="Thank_You_Content font_family sfdc_right_margin">{!$Label.c.Summery_Page_Claim}<br/><br/>
+                            {!$Label.c.Summery_Page_Confirmation} <b>&nbsp;{!v.newAccount.PersonEmail}</b>. {!$Label.c.Summery_Page_Confirmation_Claim_Id} <b>&nbsp;{!v.assetGiftCode}.</b><br/><br/>
+                        </p>
+                        <aura:set attribute="else">
+                            <aura:if isTrue="{!v.isDuplicateAsset}">
+                                <p class="Thank_You_Content font_family sfdc_right_margin">{!$Label.c.Product_registration_failed_duplicate_asset}<br/><br/>
+                                </p>  
+                                <aura:set attribute="else">
+                                    <p class="Thank_You_Content font_family sfdc_right_margin">{!$Label.c.Product_registered_not_matching_purchase_date}<br/><br/>
+                                	</p>
+                                </aura:set>
+                            </aura:if>   
+                        </aura:set>
+                    </aura:if>                   
+                </p>
+            </div>
+            <div class="slds-align_absolute-center" >
+                <lightning:button label="{!$Label.c.Back_to_Breville_button}"
+                                  class="sfdc_big_button_breville_thanks_page slds-float_center sfdc_Thanks_page_button_width_height "
+                                  onclick = "{!c.navigateToBrevilleHome}"/>
+            </div>
+        </div>
+    </aura:if>
+
+</aura:component>

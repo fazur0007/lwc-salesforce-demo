@@ -1,0 +1,31 @@
+<aura:component controller = "ProductRegistrationCustomApprovalCtrl"  implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.getProcessInstanceId}"/>
+    <aura:attribute name="processInstanceId" type="String" />
+    <aura:attribute name="spinner" type="boolean"  default ="true"/>
+    
+    <aura:attribute name="rejectedReasonError" type="boolean"  default ="fasle"/>
+    <aura:attribute name="commentsError" type="boolean"  default ="false"/>
+
+    
+    <aura:attribute name="comments" type="String" />
+    <aura:if isTrue="{!v.spinner}">
+        <lightning:spinner alternativeText="Loading" size="large" />
+    </aura:if>
+    <aura:if isTrue="{!v.processInstanceId != null}">
+        <lightning:recordEditForm aura:id="editFormAsset" recordId="{!v.recordId}" objectApiName="Asset">
+            <lightning:inputField fieldName="Approval_Rejection_Reason__c" aura:id ="aprovalRejectionReason" class="slds-input" messageWhenValueMissing="You must specify Value" />
+            <aura:if isTrue="{!v.rejectedReasonError == true}"> 
+                <div aura:id="changeIt" style="color:rgb(194, 57, 52)">{!$Label.c.Mandatory_field_error_PDPage}</div>
+            </aura:if> 
+        </lightning:recordEditForm>
+        <lightning:textarea name="comments" label="Comments" aura:id ="comments" class="slds-input" messageWhenValueMissing="You must specify Value"  />
+        <aura:if isTrue="{!v.commentsError == true}"> 
+                <div aura:id="changeIt" style="color:rgb(194, 57, 52)">{!$Label.c.Mandatory_field_error_PDPage}</div>
+        </aura:if> 
+        <lightning:button variant="success" label="Approve" title="Approve" onclick="{!c.handleApprove}"/>
+        <lightning:button variant="destructive" label="Reject" title="Reject" onclick="{!c.handleReject}"/>
+        <aura:set attribute="else">
+            No Action is Pending
+        </aura:set>
+    </aura:if>
+</aura:component>

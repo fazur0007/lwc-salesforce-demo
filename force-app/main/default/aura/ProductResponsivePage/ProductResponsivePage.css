@@ -1,0 +1,189 @@
+.THIS.slds-spinner_container {  
+    z-index: 10000;
+    position: fixed;   
+}
+
+.THIS.Register-your-product{
+    width: 358px;
+    height: 44px;
+    margin: 0 198px 32px 0;
+    font-family: ArcherSSm-Bold;
+    font-size: 32px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.38;
+    letter-spacing: normal;
+    color: #333333;
+}
+
+.THIS.PageHeader {
+    
+    height: 32px;
+    margin: 39px 147px 16px 441px;
+    font-family: ArcherSSm;
+    font-size: 24px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.33;
+    letter-spacing: normal;
+    color: #333333;
+}
+
+.THIS.HomeText {
+    margin: 16px 444px 25px 441px;
+    font-family: Arial;
+    font-size: 14px;
+    font-weight: normal;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.29;
+    letter-spacing: normal;
+    color: #333333;
+}
+
+.THIS .custom-box {
+    background-color: #f4f6f9;
+}
+.THIS .sfdc_button_breville {
+    font-family: "Arial";
+    margin: 36px auto 33px auto;
+    
+    display: block;
+    color: #ffffff;
+    background-color: #6ba235;
+    border-radius: 8px;
+    text-align: center;
+    padding: 10px 32px;
+    font-size: 18px;
+    font-weight: bold;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    width: 140px;
+    height: 52px;
+}
+
+.THIS .sfdc_big_button_breville {
+    font-family: "Arial";
+    margin: 36px auto 33px auto;
+    
+    display: block;
+    color: #ffffff;
+    background-color: #6ba235;
+    border-radius: 8px;
+    text-align: center;
+    padding: 10px 32px;
+    font-size: 18px;
+    font-weight: bold;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    width: 50%;
+    height: 52px;
+}
+.THIS .sfdc_tool_tip_top{
+    margin-top: .5%;
+    z-index: 10000;
+}
+.THIS .sfdc_tool_tip_bottom{
+    margin-top: -1%;
+}
+.THIS .sfdc_tool_tip_top_icon{
+    margin-top: 1.4%;
+    z-index: 10000;
+}
+.THIS .sfdc_tool_tip_top_inner_div{
+    margin-top: .6%;
+    z-index: 10000;
+}
+.THIS .sfdc_input_box_div{
+    padding-left: 10%;
+    padding-right: 10%;
+}
+.THIS .sfdc_tool_tip_left{
+    margin-left: 19%;
+}
+.THIS .sfdc_root_div_left{
+    margin-left: 15%;
+}
+.THIS .sfdc_next_button_root_div_left{
+    margin-left: 5%;
+    padding-right: 10%;
+}
+.THIS .sfdc_back_button_root_div_left{
+    margin-right: 3%;
+    padding-left: 10%;
+}
+.THIS .slds-form-element__label
+{
+    font-size: 18px  !important;
+    font-weight: bold !important;
+    color: black !important; 
+}
+
+
+
+
+
+.THIS .custom-height{
+    height: 500px;
+}
+.THIS .circle {
+    height: 37px;
+    width: 36px;
+    border-radius: 50%;
+    border: 2px solid #391538;
+    display: inline-block;
+}
+.THIS .cicrle-top-padding-step{
+    padding-top: 5px;
+}
+.THIS .line {
+    background-color: gray;
+    height: 1px;
+    width: 15%;
+    display: inline-block;
+    padding-bottom: 2px;
+}
+.THIS .circle-parent{
+    width: 35px;
+    display: inline-grid;
+    white-space: nowrap;
+}
+.THIS .stepLabel{
+    padding-top: 5px;
+    color: gray;
+}
+.THIS .content{
+    font-size: 25px;
+}
+.THIS .activeStep{
+    color: White;
+}
+.THIS .activeLabel{
+    color: black;
+    font-weight: bold;
+}
+.THIS .activeBackground{
+    background-color: #391538; 
+}
+.THIS .activeLine{
+    background-color: #1b7a39;
+}
+.THIS .inactiveStep{
+    height: 37px;
+    width: 36px;
+    border-radius: 50%;
+    border: 2px solid lightgrey;
+    display: inline-block;
+    background: whitesmoke;
+    color: lightgrey;
+}
+.THIS .csRed_breville {
+    color: #391538!important;
+    font-family: inherit;
+    font-size: 23px!important;
+    font-weight: initial!important;
+}

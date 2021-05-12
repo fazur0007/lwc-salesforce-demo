@@ -1,0 +1,19 @@
+.THIS .slds-modal__close{
+    border: 2px solid white !important;
+}
+.THIS .slds-form-element__label{
+    font-weight: bolder !important;
+    color: black !important;
+}
+/*
+.THIS .slds-modal__header {
+    background-color: #68d3d3;
+    color: white;
+}
+*/
+.THIS .slds-th__action{
+    background: lightgray !important;
+}
+.THIS .slds-table_header-fixed_container{
+     background: lightgray !important;
+}

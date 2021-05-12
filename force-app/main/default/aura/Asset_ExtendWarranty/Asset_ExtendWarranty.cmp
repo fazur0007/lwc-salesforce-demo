@@ -1,0 +1,85 @@
+<aura:component controller="Ltng_AssetExtendWarrantyCtrl" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global" >  
+    
+    <aura:attribute name="extendedWarrantyList" type="Map"/> 
+    <aura:attribute name="extWarrantyValue" type="String"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="value" type="String"/> 
+    <aura:attribute type="Boolean" name="showLoader" default="true"/> 
+    <aura:handler name="init" value="{!this}" action="{!c.doLoadData}"/>
+    <aura:attribute name="orderId" type="String" />
+    <aura:attribute name="selectedValue" type="String"/>
+    <lightning:navigation aura:id="navLink"/> 
+    
+    <!--Hard coding values Start-->
+    <aura:attribute name="NewOrder_NewOrderMessage" type="String" default="Extended Warranty"/><!--{!$Label.c.NewOrder_NewOrderMessage}-->
+    <aura:attribute name="NewOrder_BrandMessage" type="String" default="Select Extended Warranty"/> <!--{!$Label.c.NewOrder_BrandMessage}-->
+    <!--Hard coding values End-->
+    <aura:html tag="style">
+        .slds-modal__container{ 
+        height: 101%;
+        width: 93%;
+        max-width: 377vh !important;
+        max-height: 300vh !important; 
+        } 
+        .modal-body{ 
+        height : 300vh !important; 
+        max-height: 1000vh !important; 
+        } 
+        .slds-modal__footer{ 
+        display: inline !important; 
+        }
+    </aura:html>
+    <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if> 
+    <aura:if isTrue="{!!v.isErrorOccured}">
+        <br/><br/>
+    </aura:if>  
+    <header class="slds-modal__header">
+        <h2 class="slds-text-heading_medium"><b>{!v.NewOrder_NewOrderMessage}</b></h2>
+    </header>
+    <div class="c-container">
+        <aura:if isTrue="{!not(empty(v.extendedWarrantyList))}">
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="1" padding="around-small">
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="2" padding="around-small">
+                    <b>{!v.NewOrder_BrandMessage}</b>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="4" padding="around-small">
+                    <lightning:radioGroup name="Choose Extended Warranty" 
+                                          aura:id="extendedWarranty"
+                                          label=""
+                                          options="{! v.extendedWarrantyList}"
+                                          value="{! v.extWarrantyValue}"
+                                          type="radio"
+                                          />
+                </lightning:layoutItem>            
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="5" padding="around-small">
+                </lightning:layoutItem>
+            </lightning:layout>
+            
+            <lightning:layout multipleRows="true">
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="1" padding="around-small">
+                </lightning:layoutItem>
+                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="11" padding="around-small">
+                    <div>
+                        <br/>
+                        <lightning:button variant="Neutral" label="Cancel" title="Cancel" onclick="{! c.handleCancel }" />
+                        <lightning:button variant="brand" label="Submit" title="Submit" onclick="{! c.handleSubmit }"/>
+                    </div>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </aura:if>
+    </div>
+</aura:component>

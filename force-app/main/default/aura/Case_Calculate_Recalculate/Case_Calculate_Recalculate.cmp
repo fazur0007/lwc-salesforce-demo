@@ -1,0 +1,67 @@
+<aura:component controller="Org_QuickActionHandler"  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    <aura:attribute name="recordId" type="String" access="public"/>
+    <aura:attribute name="caseconfig" type="object" access="public"/>
+    <aura:attribute type="Boolean" name="showLoader" default="true"/>
+    <aura:attribute type="Boolean" name="showConfirmMessage" default="false"/>
+    <lightning:navigation aura:id="navLink"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" access="public"/>
+    <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if> 
+    <aura:if isTrue="{!v.showConfirmMessage}">
+        <div class="slds-page-header_record-home">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-case">
+                                <lightning:icon iconName="standard:case" alternativeText="Case" title="Case" />
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span>Case</span>
+                                        <span class="slds-page-header__title slds-truncate">Calculate/Recalculate</span>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-page-header__col-actions">
+                    <div class="slds-page-header__controls">
+                        <div class="slds-page-header__control">
+                            <ul class="slds-button-group-list">
+                                <li>
+                                    <lightning:button label="Ok" title="Ok" variant="brand" onclick="{!c.doConfirm }"/>
+                                </li>
+                                <li>
+                                    <lightning:button variant="Neutral" label="Cancel" title="Cancel" onclick="{! c.handleCancel }" />
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-page-header__row slds-page-header__row_gutters">
+                <div class="slds-page-header__col-details">
+                    <ul class="slds-page-header__detail-row">
+                        <li class="">
+                            <div class="slds-text-title" style="padding: 12px;font-weight: bold;">Recalculation will override all your modified prices, Do you want to proceed?</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

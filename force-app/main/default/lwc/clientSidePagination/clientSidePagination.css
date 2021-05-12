@@ -1,0 +1,7 @@
+.slds-button_icon{
+    border: 2px solid ghostwhite;
+}
+.slds-modal__container {
+    max-width: 50rem !important;
+    width: 80% !important;
+}

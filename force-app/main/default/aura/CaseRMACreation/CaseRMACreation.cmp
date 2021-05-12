@@ -1,0 +1,5 @@
+<aura:component controller="Ltng_NewRMARequestExtn" 
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickActionWithoutHeader,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+                access="global" >  
+	<aura:handler name="init" value="{!this}" action="{!c.doLoadData}"/>
+</aura:component>

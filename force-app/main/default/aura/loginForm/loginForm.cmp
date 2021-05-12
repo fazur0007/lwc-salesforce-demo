@@ -1,0 +1,127 @@
+<!-- add implements="forceCommunity:availableForAllPageTypes" to surface the component in community builder -->
+<aura:component controller="LightningLoginFormController" implements="forceCommunity:availableForAllPageTypes">
+    <aura:attribute name="showError" type="Boolean" required="true" description="" default="false" access="private"/>
+    <aura:attribute name="errorMessage" type="String" required="false" description="" access="private"/>
+    <aura:attribute name="startUrl" type="String" required="false" description="The url you go to after a successful login" />
+    <aura:attribute name="startUrl_custom" type="String" required="false" description="The url you go to after a successful login" />
+    <aura:attribute name="usernameLabel" type="String" required="false"/>
+    <aura:attribute name="passwordLabel" type="String" required="false"/>
+    <aura:attribute name="loginButtonLabel" type="String" required="false"/>
+    <aura:attribute name="expid" type="String" required="false" description="The branding experience ID" />        
+    
+    <aura:attribute name="forgotPasswordLabel" type="String" required="false"/>
+    <aura:attribute name="selfRegisterLabel" type="String" required="false"/>
+    <aura:attribute name="forgotPasswordUrl" type="String" required="false" default="/ForgotPassword"/>
+    <aura:attribute name="selfRegisterUrl" type="String" required="false" default="/SelfRegister"/>
+    
+    <aura:attribute name="isUsernamePasswordEnabled" type="Boolean" access="private"/>
+    <aura:attribute name="isSelfRegistrationEnabled" type="Boolean" access="private"/>
+    <aura:attribute name="expidFromServer" type="Boolean" access="private"/>
+    <aura:attribute name="communityForgotPasswordUrl" type="String" access="private"/>
+    <aura:attribute name="communitySelfRegisterUrl" type="String" access="private"/>
+    <aura:attribute name="showpassword" type="Boolean" default="false"/>
+    <aura:registerevent name="sitePropagatedStartUrl" type="c:setStartUrl"/>
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    <aura:dependency resource="c:setStartUrl" type="EVENT"/>
+    <!-- Please uncomment   -->
+    <aura:dependency resource="siteforce:registerQueryEventMap" type="EVENT"/>
+    
+    <aura:handler event="c:setStartUrl" action="{!c.setStartUrl}"/>
+    <aura:handler event="c:setExpId" action="{!c.setExpId}"/>    
+    <aura:dependency resource="c:setExpId" type="EVENT"/>  
+    
+    <!--aura handler with waiting and donewaiting events-->    
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:attribute name="spinner" type="boolean" default="FALSE"/>
+    <aura:attribute name="Enter_email_address" type="String"/>
+    <aura:attribute name="Enter_password" type="String"/>
+    <aura:attribute name="Create_Account" type="String"/>
+    <aura:attribute name="Account_Login" type="String"/>
+    <aura:attribute name="Password" type="String"/>
+    <aura:attribute name="Continue" type="String"/>
+    <aura:attribute name="Email" type="String"/>
+    <aura:attribute name="Username" type="String"/>
+    <aura:attribute name="You_have_entered_an_invalid_format" type="String"/>    
+    <aura:attribute name="Forgot_your_password" type="String"/>
+    <aura:attribute name="Not_a_Breville_member" type="String"/>
+    <aura:attribute name="Dont_have_a_Brevill_account" type="String"/>
+    <aura:attribute name="Dont_have_a_Breville_Beanz_account" type="String"/>
+    <aura:attribute name="Login" type="String"/>
+    <aura:attribute name="Welcome_back" type="String"/>
+    <aura:attribute name="PASSWORD_RESET" type="String"/>
+    <aura:attribute name="dynamicLogo" type="String" default=""/>
+    <aura:attribute name="dynamicVariant" type="String" default=""/>
+    <aura:if isTrue="{!v.spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <div>
+        <aura:if isTrue="{!v.dynamicLogo=='Breville'}">
+            <div style="box-sizing: border-box;font-size: 14px;color: rgb(3, 3, 3);box-sizing: border-box;width: 250px !important;max-width: 45% !important;height: auto;vertical-align: middle;border: 0;text-align: left !important;font-family: CircularStd-Medium;font-size: 14px;color: rgb(3, 3, 3);line-height: 1.5;">
+                <img src="{!$Resource.BrevilleLogo}" alt="Breville company logo"></img>
+            </div>
+            <div style="background-color: #624368; width: 24px; height: 4px; margin: 11px 0 24px" />            
+        </aura:if>
+        <aura:if isTrue="{!v.dynamicLogo=='beanz'}">
+            <div style="box-sizing: border-box;font-size: 14px;color: rgb(3, 3, 3);box-sizing: border-box;width: 250px !important;max-width: 45% !important;height: auto;vertical-align: middle;border: 0;text-align: left !important;font-family: CircularStd-Medium;font-size: 14px;color: rgb(3, 3, 3);line-height: 1.5;">
+                <img src="{!$Resource.Beanz}" alt="Beanz company logo"></img><br/>
+            </div><br/>
+            <div style="width: 320px;height: 28px;font-size: 20px;line-height: 28px;letter-spacing: -0.5px;color: #a25e41;font-family: Bitter-Bold;">{!v.Account_Login}</div>
+        </aura:if>
+        <aura:if isTrue="{!v.dynamicLogo=='app'}">
+            <div style="box-sizing: border-box;font-size: 14px;color: rgb(3, 3, 3);box-sizing: border-box;width: 250px !important;max-width: 45% !important;height: auto;vertical-align: middle;border: 0;text-align: left !important;font-family: CircularStd-Medium;font-size: 14px;color: rgb(3, 3, 3);line-height: 1.5;">
+                <img src="{!$Resource.BrevilleLogo}" alt="Breville company logo"></img>
+            </div>
+            <div style="background-color: #624368; width: 24px; height: 4px; margin: 11px 0 24px" /> 
+        </aura:if>
+        <aura:if isTrue="{!v.dynamicLogo=='sage'}">
+            <div style="box-sizing: border-box;font-size: 14px;color: rgb(3, 3, 3);box-sizing: border-box;width: 250px !important;max-width: 45% !important;height: auto;vertical-align: middle;border: 0;text-align: left !important;font-family: CircularStd-Medium;font-size: 14px;color: rgb(3, 3, 3);line-height: 1.5;">
+                <img src="{!$Resource.SageLogo}" style="width:81%;margin-top:15px"></img>
+            </div>
+            <div style="background-color: #624368; width: 30px; height: 4px; margin: 4px 0 24px" /> 
+        </aura:if>
+        <span>
+            <aura:renderIf isTrue="{!v.showError}">
+                <div id="error">
+                    <ui:outputRichText value="{!v.errorMessage}"/>
+                </div>
+            </aura:renderIf>
+        </span> 
+        <div>   
+            <div aura:id="headerh1">{!v.dynamicLogo=='beanz'? '' : v.Welcome_back}</div>
+            <br />
+            <div aura:id="divAlrMem">
+                {!v.dynamicLogo=='beanz'? v.Dont_have_a_Brevill_account : v.Not_a_Breville_member}&nbsp;
+                <a aura:id="divLoginHere" class="csRed underline" href="{!if(v.communitySelfRegisterUrl == null, v.selfRegisterUrl, v.communitySelfRegisterUrl)}">{!v.Create_Account}</a>            
+            </div>
+            <br />
+            <div class="sfdc" >
+                <div aura:id="bodydiv">
+                    <lightning:input messageWhenTypeMismatch="{!v.You_have_entered_an_invalid_format}" name="Username" type="email" class="input sfdc_usernameinput sfdc" aura:id="username" placeholder="{!v.dynamicLogo=='beanz'? v.Email :v.Enter_email_address}" label="{!v.Email}" variant="{!v.dynamicVariant}"/>
+                    <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon--right">
+                        <span onkeypress="{!c.doSubmit}">
+                            <lightning:input type="{!v.showpassword ? 'text':'password'}" name="password" aura:id="password"  placeholder="{!v.dynamicLogo=='beanz'? v.Password :v.Enter_password}" label="{!v.Password}" value="" class="input sfdc_usernameinput sfdc" variant="{!v.dynamicVariant}"/>
+                            
+                            <lightning:buttonIcon class="slds-button slds-input__icon slds-text-color--default" 
+                                                  iconName="{!v.showpassword ? 'utility:hide':'utility:preview'}" 
+                                                  alternativeText="{!v.coborrowerSSNCB ? 'Hide':'Show'}"
+                                                  onclick="{!c.togglePassword}"/>
+                        </span>
+                    </div>
+                    <div aura:id="forgotpwddiv" >{!v.Forgot_your_password} &nbsp;
+                        <a aura:id="forgotpwdlink" href="{!if(v.communityForgotPasswordUrl == null, v.forgotPasswordUrl, v.communityForgotPasswordUrl)}">
+                            {!v.PASSWORD_RESET}
+                        </a>
+                    </div>
+                    <lightning:button aura:id="loginButton" label="{!v.Login}" onclick="{! c.handleLogin }" />                
+                </div>
+            </div> 
+        </div>
+    </div>
+</aura:component>

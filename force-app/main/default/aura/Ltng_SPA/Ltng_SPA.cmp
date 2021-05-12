@@ -1,0 +1,240 @@
+<aura:component controller="Ltng_NewRMARequestExtn" 
+                implements="force:appHostable,lightning:isUrlAddressable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global" >
+    
+    <aura:attribute name="pageReference"     type="Object"/>
+    <aura:attribute name="isCommunityShow"   type="Boolean" default="true"/>
+    <aura:attribute name="isRMAEnabled"      type="Boolean" default="true"/>
+    <aura:attribute name="isQCAlertsEnabled"      type="Boolean" default="true"/>
+    <aura:attribute name="isKnowledgeSearch" type="Boolean" default="true"/>
+    <aura:attribute name="showLoader"        type="Boolean" default="false"/> 
+    <aura:attribute name="showWorkOrder"     type="Boolean" default="false"/>
+    <aura:attribute name="showSinglePageApplication"     type="Boolean" default="true"/>
+    <aura:attribute name="showNewOrder" type="Boolean" default="false"/>
+    <aura:attribute name="showOrderForAdmin" type="Boolean" default="true"/>
+    <lightning:navigation aura:id="navService"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" access="public"/> 
+    
+    <aura:if isTrue="{!v.showLoader}">
+        <div class="demo-only">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if> 
+    <aura:if isTrue="{!v.showSinglePageApplication}">
+        <aura:if isTrue="{!v.isKnowledgeSearch}">
+            <aura:if isTrue="{!and(v.isCommunityShow, v.isRMAEnabled)}">
+                <div class="slds-align_absolute-center">
+                    <fieldset class="slds-form-element">
+                        <div class="slds-form-element__control">
+                            <div class="slds-visual-picker slds-visual-picker_medium">
+                                <div class="" onclick = "{!c.createOrderRecord}">
+                                    <input type="checkbox" id="visual-picker-80" value="visual-picker-80" name="options" />
+                                    <label for="visual-picker-78">
+                                        <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                                            <span class="slds-is-selected">
+                                                <span class="slds-icon_container">
+                                                    <lightning:icon iconName="utility:check" size="medium" alternativeText="sss"/>
+                                                </span>
+                                            </span>
+                                            <span class="slds-is-not-selected">
+                                                <span class="slds-icon_container">
+                                                    <lightning:icon iconName="standard:orders"  size="large" alternativeText="Order" title="Order" class="zoom"/>
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <span class="slds-visual-picker__body">
+                                            <span class="slds-text-title">Orders</span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-visual-picker slds-visual-picker_medium">
+                                <div class="" onclick="{!c.createWorkRecord}">
+                                    <input type="checkbox" id="visual-picker-79" value="visual-picker-79" name="options" />
+                                    <label for="visual-picker-78">
+                                        <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                                            <span class="slds-is-selected">
+                                                <span class="slds-icon_container">
+                                                    <lightning:icon iconName="utility:check" size="medium" alternativeText="sss"/>
+                                                </span>
+                                            </span>
+                                            <span class="slds-is-not-selected"> 
+                                                <span class="slds-icon_container">
+                                                    <lightning:icon iconName="standard:work_order" size="large" alternativeText="Work Order" title="Work Order" class="zoom"/>
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <span class="slds-visual-picker__body">
+                                            <span class="slds-text-title">Work Orders</span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-visual-picker slds-visual-picker_medium">
+                                <div class="" onclick = "{!c.createRecord}">
+                                    <input type="checkbox" id="visual-picker-81" value="visual-picker-81" name="options" />
+                                    <label for="visual-picker-78">
+                                        <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                                            <span class="slds-is-selected">
+                                                <span class="slds-icon_container">
+                                                    <lightning:icon iconName="utility:check" size="medium" alternativeText="sss"/>
+                                                </span>
+                                            </span>
+                                            <span class="slds-is-not-selected">
+                                                <span class="slds-icon_container">
+                                                    <lightning:icon iconName="standard:case"  size="large" alternativeText="Case" title="Case" class="zoom"/>
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <span class="slds-visual-picker__body">
+                                            <span class="slds-text-title">RMA</span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="slds-visual-picker slds-visual-picker_medium">
+                                <div class="" onclick = "{!c.searchknowledgeBase}">
+                                    <input type="checkbox" id="visual-picker-85" value="visual-picker-85" name="options" />
+                                    <label for="visual-picker-78">
+                                        <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                                            <span class="slds-is-selected">
+                                                <span class="slds-icon_container">
+                                                    <lightning:icon iconName="utility:check" size="medium" alternativeText="sss"/>
+                                                </span>
+                                            </span>
+                                            <span class="slds-is-not-selected">
+                                                <span class="slds-icon_container">
+                                                    <lightning:icon iconName="standard:knowledge"  size="large" alternativeText="Knowledge" title="Knowledge" class="zoom"/>
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <span class="slds-visual-picker__body">
+                                            <span class="slds-text-title">Search Knowledge</span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                           <!--<div class="slds-visual-picker slds-visual-picker_medium">
+                                <div class="" onclick = "{!c.doRedirectQCAlerts}">
+                                    <input type="checkbox" id="visual-picker-90" value="visual-picker-90" name="options" />
+                                    <label for="visual-picker-78">
+                                        <span class="slds-visual-picker__figure slds-visual-picker__icon slds-align_absolute-center">
+                                            <span class="slds-is-selected">
+                                                <span class="slds-icon_container">
+                                                    <lightning:icon iconName="utility:check" size="medium" alternativeText="sss"/>
+                                                </span>
+                                            </span>
+                                            <span class="slds-is-not-selected">
+                                                <span class="slds-icon_container">
+                                                    <lightning:icon iconName="standard:bot_training"  size="large" alternativeText="QC Alerts" title="QC Alerts" class="zoom"/>
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <span class="slds-visual-picker__body">
+                                            <span class="slds-text-title">QC Alerts</span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>-->
+                        </div>
+                    </fieldset>
+                </div>
+            </aura:if>
+        </aura:if>
+    </aura:if>
+    <aura:if isTrue="{!!v.isKnowledgeSearch}">
+        <c:MultiSelectLookupComponentExample></c:MultiSelectLookupComponentExample>
+    </aura:if>
+    <aura:if isTrue="{!v.showWorkOrder}">
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_12-of-12" style="margin-top: auto;">
+                <div class="slds-clearfix">
+                    <div class="slds-float_right">
+                        <lightning:button variant="brand" label="New Work Order" title="New Work Order" onclick="{! c.doCreateNewWorkOrder }" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <lightning:listView aura:id="listOfWorkOrders"
+                            objectApiName="WorkOrder"
+                            listName="All_WorkOrders"
+                            rows="50"
+                            showSearchBar="true"
+                            showActionBar="true"
+                            enableInlineEdit="true"
+                            showRowLevelActions="true"
+                            />
+    </aura:if>
+    <aura:if isTrue="{!!v.isCommunityShow}">
+        <aura:if isTrue="{!v.showNewOrder}">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_12-of-12" style="margin-top: auto;">
+                    <div class="slds-clearfix">
+                        <div class="slds-float_right">
+                            <lightning:button variant="brand" label="New Order" title="New Order" onclick="{! c.doCreateNewOrder }" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br/>
+            <lightning:listView aura:id="listOfOrders"
+                                objectApiName="Order"
+                                listName="AllOrders"
+                                rows="50"
+                                showSearchBar="true"
+                                showActionBar="true"
+                                enableInlineEdit="true"
+                                showRowLevelActions="true"
+                                />
+        </aura:if>
+        <aura:if isTrue="{!!v.showNewOrder}">
+            <aura:if isTrue="{!v.showOrderForAdmin}">
+                <div class="slds-box"> 
+                    <c:NewOrder></c:NewOrder>
+                </div>
+            </aura:if>
+        </aura:if>
+    </aura:if>
+    <aura:if isTrue="{!!v.isRMAEnabled}">
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_12-of-12" style="margin-top: auto;">
+                <div class="slds-clearfix">
+                    <div class="slds-float_right">
+                        <lightning:button variant="brand" label="New RMA Case" title="New RMA Case" onclick="{! c.createNewRMA }" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br/> 
+        <lightning:listView aura:id="listViewRMACases"
+                            objectApiName="Case"
+                            listName="RMA_Cases"
+                            rows="50"
+                            showSearchBar="false" 
+                            showActionBar="false"
+                            enableInlineEdit="false"
+                            showRowLevelActions="false"
+                            />
+    </aura:if>
+    <aura:if isTrue="{!!v.isQCAlertsEnabled}">
+        <lightning:listView aura:id="listQCAlerts"
+                            objectApiName="QCLocation__c"
+                            listName="QC_Alerts_for_Partners"
+                            rows="50"
+                            showSearchBar="false" 
+                            showActionBar="false"
+                            enableInlineEdit="false"
+                            showRowLevelActions="false"
+                            />
+    </aura:if>
+    <!--<iframe src="/BrevillePartnerPortal/apex/MobilePaks__MobilePaks_Tab"/>-->
+</aura:component>

@@ -1,0 +1,54 @@
+.THIS .customRadioCls .slds-form-element__control .slds-radio{
+    display : inline-block !important;
+}
+.THIS .bodyWrapper{
+    margin: 26px !important; 
+}
+.THIS .buttonclass {
+    margin-top: auto;
+}
+.THIS .slds-spinner_container {
+    top: 10% !important;
+    bottom: 12% !important;
+}
+.THIS .results {
+    padding: 15px;
+}
+.THIS .search-field {
+    padding: 15px;
+}
+.THIS .accountClass{
+    font-family: 'Roboto', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.42857;
+    color: #ff5f00 !important;
+    font-weight: bold !important;
+}
+.THIS .slds-text-title_caps{
+    color:black;    
+    background:#eeeeee;
+}
+.THIS .slds-button_brand{
+    /*margin-top: 10px !important;*/
+}
+
+.THIS .slds-text-title_caps{
+    color:black;    
+    background:#eeeeee;
+}
+.THIS .promotionAppliedMessageCss{
+    color: green;
+}
+.THIS .qtyErrorMessageClass{
+    color: red;
+}
+.THIS .slds-required{
+    display:none !important;
+}
+.THIS .toastMessage {
+    white-space : pre-line !important;
+}
+.THIS .forceActionsText{
+     white-space : pre-line !important;
+}

@@ -1,0 +1,23 @@
+<aura:component controller="BrevilleWelcomeCmpController">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="value" type="List" />
+    <aura:attribute name="options" type="List" />
+    <aura:attribute name="enableProceedButton" default="true" type="Boolean" />    
+    <div class="slds-p-around_xx-large">
+        <div class="slds-align_absolute-left">
+            <h1 class="slds-p-top_medium h1class_breville"><b>Welcome!</b></h1>
+            <p class="slds-text-heading--label slds-p-top_large">Before you start, here is a checklist of things you need to be eligible to claim:</p>
+        </div>
+        <div class="slds-align_absolute-left slds-p-top_large" >
+            <lightning:checkboxGroup name="mandatoryCheckBoxGroup"
+                                     label=""
+                                     options="{!v.options}"
+                                     value="{!v.value}"
+                                     onchange="{!c.handleChange}"
+                                     aura:id = "checkboxgroup"/>            
+        </div>
+         <div class="slds-align_absolute-center slds-p-top_large">
+            <lightning:button  class="sfdc_button_breville" variant="brand" label="Proceed" title="Proceed" onclick="{!c.openSignUp}" disabled="{!v.enableProceedButton}"/>
+        </div>
+    </div>
+</aura:component>
